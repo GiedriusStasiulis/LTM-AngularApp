@@ -28,6 +28,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MsalTokenService } from './services/msal-token-service/msal-token.service';
 import { SignalRService } from './services/signalR/signal-r.service';
+import { ComponentStateService } from './services/component-state-service/component-state.service';
 
 export const protectedResourceMap: [string, string[]][] = [
   ['https://graph.microsoft.com/v2.0/me', ['user.read']]
@@ -109,7 +110,7 @@ function MSALAngularConfigFactory(): MsalAngularConfiguration {
     MsalService,
     MsalTokenService,
     SignalRService,
-    
+    ComponentStateService
   ],
   exports: [
 

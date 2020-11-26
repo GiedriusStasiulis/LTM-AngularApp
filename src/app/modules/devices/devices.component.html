@@ -1,7 +1,7 @@
 <div class="content_container">
     <div class="device_tab_container">
         <div class="frame_table_container" id="frameTable">
-            <div *ngIf="deviceTabState.deviceConnected; then showTable else showInfo"></div>
+            <div *ngIf="devicesComponentState.deviceConnected; then showTable else showInfo"></div>
             <ng-template #showTable>
                 <mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8" #scrollframe>
                     <ng-container matColumnDef="packetNo">

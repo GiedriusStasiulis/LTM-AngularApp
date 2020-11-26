@@ -1,12 +1,13 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormControl } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { LinFrame } from '../../models/linFrame'
 import { MatSort } from '@angular/material/sort';
 import { SubSink } from 'subsink/dist/subsink';
 import { SignalRService } from 'src/app/services/signalR/signal-r.service';
-import { DeviceTabState } from '../../models/deviceTabState'
+import { ComponentStateService } from '../../services/component-state-service/component-state.service';
+import { DevicesComponentState } from 'src/app/models/component-states/devices-state';
+import { ComponentStateType } from 'src/app/models/component-states/component-state-type-enum';
 
 const ELEMENT_DATA: LinFrame[] = [];
 
@@ -19,43 +20,36 @@ export class DevicesComponent implements OnInit, AfterViewInit {
 
   //Table variables
   @ViewChild(MatSort) sort: MatSort;
-  //@ViewChild('scrollframe', {static: false}) scrollFrame: ElementRef;
-  //container: HTMLElement;  
-  container: HTMLElement;
-  scrollContainer: any;
+  tableScrollContainer: HTMLElement;
   dataSource: MatTableDataSource<LinFrame>;
   displayedColumns: string[] = ['packetNo','frameNo', 'pidHex', 'pidDec', 'payload0', 'payload1', 'payload2', 'payload3', 'payload4', 'payload5', 'payload6', 'payload7'];
   columnsToDisplay: string[] = this.displayedColumns.slice();
   selectedRow : boolean;  
-
-  //Tab variables
-  tabGroupSubscription: any;
-  deviceIdTab: string;
-  deviceTabState: DeviceTabState = new DeviceTabState();
-  deviceTabs: string[] = [];
-  selected = new FormControl(0);
 
   //SignalR variables
   subSinkSubscription = new SubSink();
   signalRServiceStarted: boolean = false;
   messages: string[] = [];
 
+  //Component variables
+  devicesComponentState: DevicesComponentState;
+
   //Other variables
   timestamp: string = ''; 
 
-  constructor(private _activatedRoute: ActivatedRoute, private _router: Router, private _signalRService: SignalRService) 
+  constructor(private _signalRService: SignalRService, private _componentStateService: ComponentStateService) 
   {
+    //this.devicesComponentState.deviceId = "ESP32_SIM1";
+
     this.subSinkSubscription.sink = this._signalRService.messageObservable$.subscribe(async message => {
 
       var elementsToPush: LinFrame[] = this.parseFramePacket(JSON.parse(message));
 
-      console.log("Elements to push: " + elementsToPush);
-
-      //ELEMENT_DATA.push(elementsToPush);
       for(let i = 0; i < elementsToPush.length; i++)
       {
-        ELEMENT_DATA.push(elementsToPush[i]);
+        ELEMENT_DATA.push(elementsToPush[i]);        
         this.dataSource = new MatTableDataSource(ELEMENT_DATA);
+        //this._devicesComponentService.setLinFrames(elementsToPush[i]);
         this.scrollTableToBottom();
         await this.delay(5);
       }      
@@ -64,91 +58,40 @@ export class DevicesComponent implements OnInit, AfterViewInit {
   
   ngOnInit() 
   {   
+    this.loadComponentState();
+
+    if(this.devicesComponentState == null)
+    {
+      this.initComponentState();
+    }
+
     this.dataSource = new MatTableDataSource(ELEMENT_DATA);
     this.dataSource.sort = this.sort;
+  }
 
-    /*
-    var loadedTabs = sessionStorage.getItem("savedTabs");
-
-    if(loadedTabs != null)
+  ngAfterViewInit() 
+  {    
+    if(this.devicesComponentState.deviceConnected)
     {
-      //console.log(loadedTabs);
-      this.deviceTabs = JSON.parse(loadedTabs);
-    }    
-
-    this.tabGroupSubscription = this._activatedRoute.params.subscribe(params => {
-        
-      this.deviceIdTab = params['id'];
-
-      this.dataSource = new MatTableDataSource(ELEMENT_DATA);
       this.dataSource.sort = this.sort;
-
-      if(!this.deviceTabs.includes(this.deviceIdTab))
-      {
-        this.deviceTabs.push(this.deviceIdTab);
-        this.selected.setValue(this.deviceTabs.length - 1);
-        this.initDeviceTabState(this.deviceIdTab);
-
-        sessionStorage.setItem("savedTabs", JSON.stringify(this.deviceTabs));
-      }
-
-      else
-      {
-        this.selected.setValue(this.deviceTabs.indexOf(this.deviceIdTab));
-        this.loadDeviceTabState(this.deviceIdTab);
-      }    
-    });    */
+    } 
   }
 
-  onTabChange(_event: { tab: { textLabel: string; }; }) 
-  {
-    this.saveDeviceTabState(this.deviceTabState);
-    this._router.navigate([`/devices/${_event.tab.textLabel}`]); 
+  ngOnDestroy() {
+    this.saveComponentState(this.devicesComponentState);
   }
 
-  initDeviceTabState(_deviceId : string)
-  {
-    this.deviceTabState.deviceId = _deviceId;
-    this.deviceTabState.deviceConnected = false;
 
-    this.saveDeviceTabState(this.deviceTabState);
-  }
 
-  saveDeviceTabState(_deviceTabState : DeviceTabState)
-  {
-    sessionStorage.setItem(`${_deviceTabState.deviceId}_tabState`, JSON.stringify(_deviceTabState));
-  }
-
-  loadDeviceTabState(_deviceId : string)
-  {
-    var loadedDeviceTabState = sessionStorage.getItem(`${_deviceId}_tabState`);
-    let obj: DeviceTabState = JSON.parse(loadedDeviceTabState);
-
-    this.deviceTabState = obj;
-
-    this.saveDeviceTabState(this.deviceTabState);
-  }  
-
-  saveComponentState()
-  {
-
-  }
-
-  loadComponentState()
-  {
-
-  }
-
+  //SignalR Service functions
   async addUserToSignalRGroup()
   {
-    const _deviceId = "ESP32_SIM1";
-
-    (await this._signalRService.addUserToSignalRGroup(_deviceId)).subscribe(results => {
-        console.log("Results: " + JSON.stringify(results));
-
-        this.deviceTabState.deviceConnected = true;
+    (await this._signalRService.addUserToSignalRGroup(this.devicesComponentState.deviceId)).subscribe(results => {
+        //console.log("Results: " + JSON.stringify(results));
+        
         this._signalRService.addDeviceConnection();
-        this.saveDeviceTabState(this.deviceTabState);
+        this.devicesComponentState.deviceConnected = true;
+        this.saveComponentState(this.devicesComponentState);
       },
         err => {
           console.log("Error: " + JSON.stringify(err));
@@ -158,19 +101,26 @@ export class DevicesComponent implements OnInit, AfterViewInit {
 
   async removeUserFromSignalRGroup()
   {    
-    const _deviceId = "ESP32_SIM1";   
-
-    (await this._signalRService.removeUserFromSignalRGroup(_deviceId)).subscribe(results => {
-      console.log("Results: " + JSON.stringify(results));
-
-      this.deviceTabState.deviceConnected = false;
-      this._signalRService.removeDeviceConnection();      
-      this.saveDeviceTabState(this.deviceTabState);
+    (await this._signalRService.removeUserFromSignalRGroup(this.devicesComponentState.deviceId)).subscribe(results => {
+      //console.log("Results: " + JSON.stringify(results));
+      
+      this._signalRService.removeDeviceConnection();   
+      this.devicesComponentState.deviceConnected = false;   
+      this.saveComponentState(this.devicesComponentState);
     },
       err => {
         console.log("Error: " + JSON.stringify(err));
       }      
     );   
+  }
+
+
+
+  //Table functions
+  scrollTableToBottom()
+  {
+    this.tableScrollContainer = document.getElementById("frameTable");           
+    this.tableScrollContainer.scrollTop = this.tableScrollContainer.scrollHeight;
   }
 
   onRowClicked(_row: boolean) 
@@ -190,25 +140,9 @@ export class DevicesComponent implements OnInit, AfterViewInit {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
-  getCurrentDateTime(): string
-  {
-    let dTimeNow = new Date().toLocaleString();
-    return dTimeNow;
-  }
   
-  ngAfterViewInit() 
-  {    
-    if(this.deviceTabState.deviceConnected)
-    {
-      this.dataSource.sort = this.sort;
-    }   
-  }
-
-  ngOnDestroy() {
-    this.saveDeviceTabState(this.deviceTabState);
-    this.tabGroupSubscription.unsubscribe();
-  }
-
+  
+  //Data functions
   parseFramePacket(message: any)
   {
     const LIN_FRAMES: LinFrame[] = [];
@@ -238,10 +172,33 @@ export class DevicesComponent implements OnInit, AfterViewInit {
     return LIN_FRAMES;
   }
 
-  scrollTableToBottom()
+  
+
+  //Component state functions
+  initComponentState()
   {
-    this.container = document.getElementById("frameTable");           
-    this.container.scrollTop = this.container.scrollHeight;
+    this.devicesComponentState = new DevicesComponentState();
+
+    //Set default properties
+    this.devicesComponentState.deviceConnected = false;
+    this.devicesComponentState.deviceId = "ESP32_SIM1";
+  }
+
+  saveComponentState(_deviceComponentState: DevicesComponentState)
+  {
+    this._componentStateService.saveComponentState(ComponentStateType.DevicesComponentState, _deviceComponentState);
+  }
+
+  loadComponentState()
+  {
+    this.devicesComponentState = this._componentStateService.loadComponentState(ComponentStateType.DevicesComponentState);
+  }
+
+  //MISQ
+  getCurrentDateTime(): string
+  {
+    let dTimeNow = new Date().toLocaleString();
+    return dTimeNow;
   }
 
   delay(ms: number) {
