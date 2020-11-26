@@ -1,0 +1,18 @@
+button {
+    position: fixed;
+    bottom: 16px !important;
+    left: 8px !important;
+}
+
+button:focus {
+    outline: 0;
+}
+
+mat-icon {
+    font-size: 25px;
+    text-align: center;
+    vertical-align: middle;
+    border-radius: 25px;
+    color: #2c353c;
+    background-color: #d5dfe8;
+}

@@ -1,0 +1,37 @@
+.title {
+    flex: 1 1 auto;
+    text-align: center;
+}
+
+mat-toolbar {
+    height: 50px;
+    background-color: white !important;
+    text-align: right !important;
+}
+
+.navbar {
+    width: 100%;
+    font-size: 15px;
+    color: black !important;
+}
+
+.user_icon {
+    font-size: 25px;
+}
+
+#btn_logout {
+    float: right;
+}
+
+.nav-item {
+    list-style-type: none;
+    font-size: 15px;
+}
+
+.dropdown-toggle {
+    color: black !important;
+}
+
+.dropdown-item {
+    color: black !important;
+}

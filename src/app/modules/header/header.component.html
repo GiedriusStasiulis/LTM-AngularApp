@@ -1,0 +1,20 @@
+<mat-toolbar color="primary">
+    <!--<app-toggle-sidebar></app-toggle-sidebar>-->
+    <!--<div class="form-group">
+        <button id="btn_logout" class="btn btn-primary" (click)="logout()">Logout</button>
+    </div>-->
+    <div class="navbar d-flex flex-row">
+        <div class="p-2">Lin Traffic Monitor</div>
+        <div class="p-2">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="material-icons user_icon">account_circle</span> {{ profileName }}
+                </a>
+                <div class="dropdown-menu dropdown-menu-right dropdown-info" aria-labelledby="navbarDropdownMenuLink-4">
+                    <a class="btn dropdown-item" (click)="logout()">Logout</a>
+                </div>
+            </li>
+        </div>
+    </div>
+
+</mat-toolbar>

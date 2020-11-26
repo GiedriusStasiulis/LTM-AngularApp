@@ -1,0 +1,8 @@
+<button mat-icon-button (click)="toggleSideNav()">
+    <div *ngIf="sidebarState==='open'">
+        <mat-icon>chevron_left</mat-icon>
+    </div>
+    <div *ngIf="sidebarState==='close'">
+        <mat-icon>chevron_right</mat-icon>
+    </div>
+</button>
