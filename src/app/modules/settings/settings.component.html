@@ -1,7 +1,47 @@
 <div class="main_container">
-    <div style="text-align:center">
-        <h1>
-            Settings
-        </h1>
+    <!-- app.component.html -->
+    <div class="container text-center">
+
+        <button mat-button (click)="openDialog('Add',{})" mat-flat-button color="primary">Add Row</button>
+
+        <mat-table [dataSource]="dataSource" #mytable class="my-table mat-elevation-z8">
+
+            <!--- Note that these columns can be defined in any order.
+          The actual rendered columns are set as a property on the row definition" -->
+
+            <!-- Byte column -->
+            <ng-container matColumnDef="byte_name">
+                <mat-header-cell *matHeaderCellDef> Byte name </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.byte_name}} </mat-cell>
+                <!--<ng-select [(ngModel)]="selectedCar">
+                    <ng-option *ngFor="let byte_name of byte_names" [value]="byte_name.id">{{byte_name.name}}</ng-option>
+                </ng-select>-->
+            </ng-container>
+
+            <!-- Hex value Column -->
+            <ng-container matColumnDef="hex_value">
+                <mat-header-cell *matHeaderCellDef> Hex value </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.hex_value}} </mat-cell>
+            </ng-container>
+
+            <!-- Name value Column -->
+            <ng-container matColumnDef="custom_name">
+                <mat-header-cell *matHeaderCellDef> Custom name </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.custom_name}} </mat-cell>
+            </ng-container>
+
+            <!-- Action Column -->
+            <ng-container matColumnDef="action">
+                <mat-header-cell *matHeaderCellDef> Action </mat-header-cell>
+                <mat-cell *matCellDef="let element" class="action-link">
+                    <a (click)="openDialog('Update',element)">Edit</a> |
+                    <a (click)="openDialog('Delete',element)">Delete</a>
+                </mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        </mat-table>
+
     </div>
 </div>

@@ -1,5 +1,4 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
 import { MatTableDataSource } from '@angular/material/table';
 import { LinFrame } from '../../models/linFrame'
 import { MatSort } from '@angular/material/sort';
@@ -37,10 +36,18 @@ export class DevicesComponent implements OnInit, AfterViewInit {
   //Other variables
   timestamp: string = ''; 
 
+  selected = 'option2';
+  selectedCar: number;
+ 
+    cars = [
+        { id: 1, name: 'Volvo' },
+        { id: 2, name: 'Saab' },
+        { id: 3, name: 'Opel' },
+        { id: 4, name: 'Audi' },
+    ];
+
   constructor(private _signalRService: SignalRService, private _componentStateService: ComponentStateService) 
   {
-    //this.devicesComponentState.deviceId = "ESP32_SIM1";
-
     this.subSinkSubscription.sink = this._signalRService.messageObservable$.subscribe(async message => {
 
       var elementsToPush: LinFrame[] = this.parseFramePacket(JSON.parse(message));
@@ -49,11 +56,13 @@ export class DevicesComponent implements OnInit, AfterViewInit {
       {
         ELEMENT_DATA.push(elementsToPush[i]);        
         this.dataSource = new MatTableDataSource(ELEMENT_DATA);
-        //this._devicesComponentService.setLinFrames(elementsToPush[i]);
         this.scrollTableToBottom();
         await this.delay(5);
       }      
     });      
+
+    this.dataSource = new MatTableDataSource(ELEMENT_DATA);
+    this.dataSource.sort = this.sort;
   }  
   
   ngOnInit() 
@@ -63,10 +72,7 @@ export class DevicesComponent implements OnInit, AfterViewInit {
     if(this.devicesComponentState == null)
     {
       this.initComponentState();
-    }
-
-    this.dataSource = new MatTableDataSource(ELEMENT_DATA);
-    this.dataSource.sort = this.sort;
+    }    
   }
 
   ngAfterViewInit() 

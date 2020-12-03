@@ -1,6 +1,7 @@
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import 'https://fonts.googleapis.com/icon?family=Material+Icons';
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
+@import "~@ng-select/ng-select/themes/default.theme.css";
 html,
 body {
     height: 100% !important;
@@ -141,7 +142,7 @@ body {
 }
 
 .frame_table_controls_container {
-    height: 150px;
+    height: 160px;
     width: 100%;
     min-width: 800px;
     background-color: ivory;

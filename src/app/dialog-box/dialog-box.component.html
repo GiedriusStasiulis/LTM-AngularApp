@@ -1,0 +1,31 @@
+<!-- dialog-box.component.html -->
+<h1 mat-dialog-title>Custom byte name: <strong>{{action}}</strong></h1>
+<div mat-dialog-content>
+    <div *ngIf="action != 'Delete'; else elseTemplate">
+        <mat-form-field appearance="fill">
+            <mat-label>Select byte</mat-label>
+            <mat-select matInput [(ngModel)]="local_data.byte_name">
+                <mat-option *ngFor="let byte of byte_names" [value]="byte.name">
+                    {{byte.name}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Hex value</mat-label>
+            <input matInput [(ngModel)]="local_data.hex_value">
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Custom name</mat-label>
+            <input matInput [(ngModel)]="local_data.custom_name">
+        </mat-form-field>
+    </div>
+    <ng-template #elseTemplate>
+        <b>{{local_data.byte_name}}</b>
+        <b> - {{local_data.hex_value}}</b>
+        <b> - {{local_data.custom_name}}</b>
+    </ng-template>
+</div>
+<div mat-dialog-actions>
+    <button mat-button (click)="doAction()">{{action}}</button>
+    <button mat-button (click)="closeDialog()" mat-flat-button color="warn">Cancel</button>
+</div>

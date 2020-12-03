@@ -7,13 +7,18 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule } from '@angular/material/sort';
-
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { SidebarModule } from './modules/sidebar/sidebar.module';
 import { ToggleSidebarModule } from './modules/toggle-sidebar/toggle-sidebar.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { DevicesModule } from './modules/devices/devices.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { HeaderModule } from './modules/header/header.module';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 
 import {
   MsalModule,
@@ -29,6 +34,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MsalTokenService } from './services/msal-token-service/msal-token.service';
 import { SignalRService } from './services/signalR/signal-r.service';
 import { ComponentStateService } from './services/component-state-service/component-state.service';
+import { DialogBoxComponent } from './dialog-box/dialog-box.component';
 
 export const protectedResourceMap: [string, string[]][] = [
   ['https://graph.microsoft.com/v2.0/me', ['user.read']]
@@ -72,7 +78,8 @@ function MSALAngularConfigFactory(): MsalAngularConfiguration {
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    DialogBoxComponent
   ],
   imports: [
     BrowserModule,
@@ -92,6 +99,12 @@ function MSALAngularConfigFactory(): MsalAngularConfiguration {
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    NgSelectModule,
+    MatInputModule,
+    MatButtonModule,
+    MatDialogModule
   ],
   providers: [
     {

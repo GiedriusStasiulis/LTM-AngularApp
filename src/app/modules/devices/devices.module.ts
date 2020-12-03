@@ -6,6 +6,11 @@ import { MatTableModule } from '@angular/material/table';
 import { MatSortModule } from '@angular/material/sort';
 import { MsalTokenService } from 'src/app/services/msal-token-service/msal-token.service';
 import { SignalRService } from 'src/app/services/signalR/signal-r.service';
+import { ComponentStateService } from '../../services/component-state-service/component-state.service';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [DevicesComponent],
@@ -13,12 +18,17 @@ import { SignalRService } from 'src/app/services/signalR/signal-r.service';
     CommonModule,
     MatTabsModule,
     MatTableModule,
-    MatSortModule
+    MatSortModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    NgSelectModule,
+    FormsModule
   ],
   exports: [],
   providers: [
     MsalTokenService,
-    SignalRService
+    SignalRService,
+    ComponentStateService
   ]
 })
 export class DevicesModule { }

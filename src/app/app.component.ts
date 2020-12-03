@@ -43,7 +43,7 @@ export class AppComponent implements OnInit
         //console.log(payload);
     });
 
-    console.log(this._authService.getAccount());
+    //console.log(this._authService.getAccount());
 
     this._authService.handleRedirectCallback((authError, response) => {
       if (authError) {
