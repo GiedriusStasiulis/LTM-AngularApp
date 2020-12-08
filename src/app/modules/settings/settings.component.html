@@ -1,41 +1,38 @@
 <div class="main_container">
     <!-- app.component.html -->
-    <div class="container text-center">
+    <div class="container p-2">
 
-        <button mat-button (click)="openDialog('Add',{})" mat-flat-button color="primary">Add Row</button>
+        <button type="button" class="btn btn-primary" (click)="openDialog('Add',{})">New custom byte name</button>
 
         <mat-table [dataSource]="dataSource" #mytable class="my-table mat-elevation-z8">
 
             <!--- Note that these columns can be defined in any order.
           The actual rendered columns are set as a property on the row definition" -->
 
-            <!-- Byte column -->
-            <ng-container matColumnDef="byte_name">
-                <mat-header-cell *matHeaderCellDef> Byte name </mat-header-cell>
-                <mat-cell *matCellDef="let element"> {{element.byte_name}} </mat-cell>
-                <!--<ng-select [(ngModel)]="selectedCar">
-                    <ng-option *ngFor="let byte_name of byte_names" [value]="byte_name.id">{{byte_name.name}}</ng-option>
-                </ng-select>-->
+            <!-- PID hex value column -->
+            <ng-container matColumnDef="PIDHexValue">
+                <mat-header-cell *matHeaderCellDef> PID hex value </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.PIDHexValue}} </mat-cell>
             </ng-container>
 
-            <!-- Hex value Column -->
-            <ng-container matColumnDef="hex_value">
-                <mat-header-cell *matHeaderCellDef> Hex value </mat-header-cell>
-                <mat-cell *matCellDef="let element"> {{element.hex_value}} </mat-cell>
+            <!-- PID custom name Column -->
+            <ng-container matColumnDef="PIDName">
+                <mat-header-cell *matHeaderCellDef> PID custom name </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.PIDName}} </mat-cell>
             </ng-container>
 
-            <!-- Name value Column -->
-            <ng-container matColumnDef="custom_name">
-                <mat-header-cell *matHeaderCellDef> Custom name </mat-header-cell>
-                <mat-cell *matCellDef="let element"> {{element.custom_name}} </mat-cell>
+            <!-- Payload[0] custom name Column -->
+            <ng-container matColumnDef="Payload0Name">
+                <mat-header-cell *matHeaderCellDef> Payload[0] custom name </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.Payload0Name}} </mat-cell>
             </ng-container>
 
             <!-- Action Column -->
-            <ng-container matColumnDef="action">
+            <ng-container matColumnDef="Action">
                 <mat-header-cell *matHeaderCellDef> Action </mat-header-cell>
                 <mat-cell *matCellDef="let element" class="action-link">
-                    <a (click)="openDialog('Update',element)">Edit</a> |
-                    <a (click)="openDialog('Delete',element)">Delete</a>
+                    <a class="btn btn-warning" (click)="openDialog('Update',element)">Edit</a>
+                    <a class="btn btn-danger" (click)="openDialog('Delete',element)">Delete</a>
                 </mat-cell>
             </ng-container>
 

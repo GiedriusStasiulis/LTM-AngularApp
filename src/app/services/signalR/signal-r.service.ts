@@ -29,7 +29,7 @@ export class SignalRService {
   authHeader: string = ''; 
   signalRServiceStarted: boolean = false;
 
-  constructor(private _httpClient: HttpClient, private _msalTokenService: MsalTokenService) {
+  constructor(private _httpClient: HttpClient) {
     this.message$ = new Subject<string>();
     this.messageObservable$ = this.message$.asObservable();
 
@@ -57,23 +57,15 @@ export class SignalRService {
     });  
    }
 
-  async getSignalRConnectionInfo(): Promise<Observable<SignalRConnectionInfo>> 
+  getSignalRConnectionInfo(): Observable<SignalRConnectionInfo>
   {
-    this.authHeader = await this._msalTokenService.getAuthHeader();
-
     let requestUrl: string = `${this.azureUrl}negotiate`;
-
-    return this._httpClient.get<SignalRConnectionInfo>(requestUrl, 
-      {
-        headers: new HttpHeaders({ 
-          'Authorization': `${this.authHeader}`, 
-          'Content-Type': 'application/json'}) 
-      });
+    return this._httpClient.get<SignalRConnectionInfo>(requestUrl);
   }
 
-  async startSignalRClient()
+  startSignalRClient()
   {
-      (await this.getSignalRConnectionInfo()).subscribe(results => {
+      this.getSignalRConnectionInfo().subscribe(results => {
         this.init(results);
         console.log("SignalR Service started!")
         this.signalRServiceStarted = true;
@@ -84,7 +76,7 @@ export class SignalRService {
   }
 
   //To-Do?
-  async stopSignalRClient()
+  stopSignalRClient()
   {
     console.log("Stoping SignalR Service!");
     this.signalRServiceStarted = false;
@@ -113,9 +105,7 @@ export class SignalRService {
     );
 
     this.hubConnection.on('notify', (data: any) => {
-      //console.log("Notification: " + data);
       this.announceMessage(data);
-      //console.log(data);
     });
 
     this.hubConnection.onclose((_error) => {
@@ -126,29 +116,16 @@ export class SignalRService {
     });
   }
 
-  async addUserToSignalRGroup(_deviceId: string): Promise<Observable<object>>
+  addUserToSignalRGroup(_deviceId: string): Observable<object>
   {
-    this.authHeader = await this._msalTokenService.getAuthHeader();
-
     let requestUrl: string = `${this.azureUrl}AddUserToSignalRGroup/${_deviceId}`;
-
-    return this._httpClient.get(requestUrl, {
-      headers: new HttpHeaders({ 
-        'Authorization': `${this.authHeader}`, 
-        'Content-Type': 'application/json'}) 
-    });
+    return this._httpClient.get(requestUrl);
   }
 
-  async removeUserFromSignalRGroup(_deviceId: string): Promise<Observable<object>>
+  removeUserFromSignalRGroup(_deviceId: string): Observable<object>
   {
-    this.authHeader = await this._msalTokenService.getAuthHeader();
-
     let requestUrl: string = `${this.azureUrl}RemoveUserFromSignalRGroup/${_deviceId}`;
-    return this._httpClient.get(requestUrl, {
-      headers: new HttpHeaders({ 
-        'Authorization': `${this.authHeader}`, 
-        'Content-Type': 'application/json'}) 
-    });
+    return this._httpClient.get(requestUrl);
   }
 
   private announceMessage(message: string): void {

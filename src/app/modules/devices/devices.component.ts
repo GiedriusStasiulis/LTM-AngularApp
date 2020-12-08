@@ -36,15 +36,12 @@ export class DevicesComponent implements OnInit, AfterViewInit {
   //Other variables
   timestamp: string = ''; 
 
-  selected = 'option2';
-  selectedCar: number;
- 
-    cars = [
-        { id: 1, name: 'Volvo' },
-        { id: 2, name: 'Saab' },
-        { id: 3, name: 'Opel' },
-        { id: 4, name: 'Audi' },
+  devices = [
+        { id: 1, name: 'ESP32_SIM1' },
+        { id: 2, name: 'ESP32_DEV1' }
     ];
+
+  selectedDevice = this.devices[0];
 
   constructor(private _signalRService: SignalRService, private _componentStateService: ComponentStateService) 
   {
@@ -62,7 +59,7 @@ export class DevicesComponent implements OnInit, AfterViewInit {
     });      
 
     this.dataSource = new MatTableDataSource(ELEMENT_DATA);
-    this.dataSource.sort = this.sort;
+    this.dataSource.sort = this.sort;    
   }  
   
   ngOnInit() 
@@ -90,10 +87,10 @@ export class DevicesComponent implements OnInit, AfterViewInit {
 
 
   //SignalR Service functions
-  async addUserToSignalRGroup()
+  addUserToSignalRGroup()
   {
-    (await this._signalRService.addUserToSignalRGroup(this.devicesComponentState.deviceId)).subscribe(results => {
-        //console.log("Results: " + JSON.stringify(results));
+    this._signalRService.addUserToSignalRGroup(this.devicesComponentState.deviceId).subscribe(results => {
+        console.log("Results: " + JSON.stringify(results));
         
         this._signalRService.addDeviceConnection();
         this.devicesComponentState.deviceConnected = true;
@@ -105,10 +102,10 @@ export class DevicesComponent implements OnInit, AfterViewInit {
       );
   }
 
-  async removeUserFromSignalRGroup()
+  removeUserFromSignalRGroup()
   {    
-    (await this._signalRService.removeUserFromSignalRGroup(this.devicesComponentState.deviceId)).subscribe(results => {
-      //console.log("Results: " + JSON.stringify(results));
+    this._signalRService.removeUserFromSignalRGroup(this.devicesComponentState.deviceId).subscribe(results => {
+      console.log("Results: " + JSON.stringify(results));
       
       this._signalRService.removeDeviceConnection();   
       this.devicesComponentState.deviceConnected = false;   

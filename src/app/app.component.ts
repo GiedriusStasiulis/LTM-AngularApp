@@ -17,7 +17,6 @@ export class AppComponent implements OnInit
   sidebarState: string;
   loggedIn = false;
   subscription: any;
-
   constructor(private _sidebarService: SidebarService, private _broadcastService: BroadcastService, private _authService: MsalService) { }
 
   ngOnInit() {
@@ -28,22 +27,16 @@ export class AppComponent implements OnInit
       });
 
     this.checkoutAccount();    
-    //this.aquireAccessToken();
 
     this._broadcastService.subscribe('msal:loginSuccess', () => {
       this.checkoutAccount();        
-      //this.aquireAccessToken();
     });
 
     this.subscription =  this._broadcastService.subscribe("msal:acquireTokenSuccess", (payload) => {
-      //console.log("Acquire token success: " + JSON.stringify(payload));
     })
 
     this.subscription =  this._broadcastService.subscribe("msal:acquireTokenFailure", (payload) => {
-        //console.log(payload);
     });
-
-    //console.log(this._authService.getAccount());
 
     this._authService.handleRedirectCallback((authError, response) => {
       if (authError) {
@@ -61,10 +54,10 @@ export class AppComponent implements OnInit
       piiLoggingEnabled: false
     }));
 
-    if(!this.loggedIn)
+    /*if(!this.loggedIn)
     {
-      this.login();
-    }    
+      //this.login();
+    }   */ 
   }
 
   checkoutAccount() {
@@ -85,4 +78,14 @@ export class AppComponent implements OnInit
     localStorage.clear();
     this._authService.logout();    
   } 
+
+  ngOnDestroy() {
+
+    this._authService.logout();
+
+    this._broadcastService.getMSALSubject().next(1);
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
 }

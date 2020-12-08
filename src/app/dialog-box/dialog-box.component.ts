@@ -1,18 +1,8 @@
 import { Component, Inject, OnInit, Optional } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatInputModule } from '@angular/material/input';
-
-export interface UsersData {
-  name: string;
-  id: number;
-}
-
-export interface CustomByteName {
-  id: number;
-  byte_name: string;
-  hex_value: string;
-  custom_name: string;
-}
+import { MsalService } from '@azure/msal-angular';
+import { CustomByteNamingItem } from '../models/customByteNamingItem';
+import { SettingsDataService } from '../services/settings-data/settings-data.service';
 
 @Component({
   selector: 'app-dialog-box',
@@ -24,33 +14,73 @@ export class DialogBoxComponent {
   action:string;
   local_data:any;
 
-  byte_names = [
-    { id: 1, name: "PID"},
-    { id: 2, name: "Payload[0]"},
-    { id: 3, name: "Payload[1]"},
-    { id: 4, name: "Payload[2]"},
-    { id: 5, name: "Payload[3]"},
-    { id: 6, name: "Payload[4]"},
-    { id: 7, name: "Payload[5]"},
-    { id: 8, name: "Payload[6]"},
-    { id: 9, name: "Payload[7]"},
-  ];
+  showInput: boolean;
+  saveInProgress: boolean;
+  saveResult: boolean;
+  saveOK: boolean;
 
   constructor(
-    public dialogRef: MatDialogRef<DialogBoxComponent>,
+    public dialogRef: MatDialogRef<DialogBoxComponent>, private _settingsDataService: SettingsDataService, private _authService: MsalService,
     //@Optional() is used to prevent error if no data is passed
-    @Optional() @Inject(MAT_DIALOG_DATA) public data: CustomByteName) {
-    console.log(data);
+    @Optional() @Inject(MAT_DIALOG_DATA) public data: CustomByteNamingItem) {
     this.local_data = {...data};
     this.action = this.local_data.action;
+    
+    this.showInput = true;
+    this.saveInProgress = false;
+    this.saveOK = false;
+    this.saveResult = false;
   }
 
-  doAction(){
-    this.dialogRef.close({event:this.action,data:this.local_data});
+  doAction(arg: any){
+
+    console.log("Argument: " + arg);
+
+    this.showInput = false;
+    this.saveInProgress = true;
+
+    if(arg == "Add" || arg == "Update")
+    {
+      const CUSTOM_BYTE_NAMING_ITEM: CustomByteNamingItem = {
+        id: this.local_data.id,
+        UserID: this._authService.getAccount().accountIdentifier,
+        PIDHexValue: this.local_data.PIDHexValue,
+        PIDName: this.local_data.PIDName,
+        Payload0Name: this.local_data.Payload0Name
+      };
+
+      this._settingsDataService.saveCustomByteNames(CUSTOM_BYTE_NAMING_ITEM).subscribe(results => {
+        console.log("Results: " + JSON.stringify(results));
+
+        //Then show saved result
+        this.saveInProgress = false;
+        this.saveResult = true;
+        this.saveOK = true;
+
+        if(this.saveOK)
+        {
+          this.dialogRef.close({event:this.action,data:this.local_data});
+        }
+      },
+        err => {
+          console.log("Error: " + JSON.stringify(err));
+
+          //Show error while saving
+          this.saveInProgress = false;
+          this.saveResult = true;
+          this.saveOK = false;
+          //Click OK to close
+          //this.dialogRef.close({event:"Error"});
+        }      
+      );   
+    }
+    else if(arg == "Delete")
+    {
+
+    }    
   }
 
   closeDialog(){
     this.dialogRef.close({event:'Cancel'});
   }
-
 }

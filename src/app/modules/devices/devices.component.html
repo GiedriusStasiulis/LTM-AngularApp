@@ -25,42 +25,42 @@
                     </ng-container>
 
                     <ng-container matColumnDef="payload0">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> P[0] </mat-header-cell>
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Payload[0] </mat-header-cell>
                         <mat-cell *matCellDef="let element"> {{element.FDATA0}} </mat-cell>
                     </ng-container>
 
                     <ng-container matColumnDef="payload1">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> P[1] </mat-header-cell>
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Payload[1] </mat-header-cell>
                         <mat-cell *matCellDef="let element"> {{element.FDATA1}} </mat-cell>
                     </ng-container>
 
                     <ng-container matColumnDef="payload2">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> P[2] </mat-header-cell>
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Payload[2] </mat-header-cell>
                         <mat-cell *matCellDef="let element"> {{element.FDATA2}} </mat-cell>
                     </ng-container>
 
                     <ng-container matColumnDef="payload3">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> P[3] </mat-header-cell>
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Payload[3] </mat-header-cell>
                         <mat-cell *matCellDef="let element"> {{element.FDATA3}} </mat-cell>
                     </ng-container>
 
                     <ng-container matColumnDef="payload4">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> P[4] </mat-header-cell>
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Payload[4] </mat-header-cell>
                         <mat-cell *matCellDef="let element"> {{element.FDATA4}} </mat-cell>
                     </ng-container>
 
                     <ng-container matColumnDef="payload5">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> P[5] </mat-header-cell>
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Payload[5] </mat-header-cell>
                         <mat-cell *matCellDef="let element"> {{element.FDATA5}} </mat-cell>
                     </ng-container>
 
                     <ng-container matColumnDef="payload6">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> P[6] </mat-header-cell>
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Payload[6] </mat-header-cell>
                         <mat-cell *matCellDef="let element"> {{element.FDATA6}} </mat-cell>
                     </ng-container>
 
                     <ng-container matColumnDef="payload7">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> P[7] </mat-header-cell>
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Payload[7] </mat-header-cell>
                         <mat-cell *matCellDef="let element"> {{element.FDATA7}} </mat-cell>
                     </ng-container>
 
@@ -78,9 +78,11 @@
         <div class="frame_table_controls_container">
             <div class="device_control_wrapper">
                 <!--Using ng-option and for loop-->
-                <ng-select [(ngModel)]="selectedCar">
-                    <ng-option *ngFor="let car of cars" [value]="car.id">{{car.name}}</ng-option>
+                <ng-select [(ngModel)]="selectedDevice">
+                    <ng-option *ngFor="let device of devices" [value]="device.name">{{device.name}}</ng-option>
                 </ng-select>
+                <button type="button" class="btn btn-primary ml-1" (click)="addUserToSignalRGroup()">Connect</button>
+                <button type="button" class="btn btn-primary ml-1" (click)="removeUserFromSignalRGroup()">Disconnect</button>
             </div>
             <div class="filtering_control_wrapper"></div>
         </div>

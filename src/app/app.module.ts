@@ -34,7 +34,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MsalTokenService } from './services/msal-token-service/msal-token.service';
 import { SignalRService } from './services/signalR/signal-r.service';
 import { ComponentStateService } from './services/component-state-service/component-state.service';
+import { SettingsDataService } from '../app/services/settings-data/settings-data.service';
 import { DialogBoxComponent } from './dialog-box/dialog-box.component';
+import { MsalTokenInterceptorService } from './services/msal-token-interceptor/msal-token-interceptor.service';
 
 export const protectedResourceMap: [string, string[]][] = [
   ['https://graph.microsoft.com/v2.0/me', ['user.read']]
@@ -50,7 +52,7 @@ function MSALConfigFactory(): Configuration {
       validateAuthority: true,
       redirectUri: "http://localhost:4200/",
       postLogoutRedirectUri: "http://localhost:4200/",
-      navigateToLoginRequestUrl: false,
+      navigateToLoginRequestUrl: true,
     },
     cache: {
       cacheLocation: "localStorage",
@@ -65,13 +67,10 @@ function MSALAngularConfigFactory(): MsalAngularConfiguration {
     consentScopes: [
       "User.Read",
       "openid",
-      "profile",
-      "api://5d98c088-fcf6-46b5-b2d8-d912c8126c0d/.default"
+      "profile"
     ],
     unprotectedResources: ["https://www.microsoft.com/en-us/"],
-    protectedResourceMap: [
-      ['https://graph.microsoft.com/v2.0/me', ['User.Read']]
-    ],
+    protectedResourceMap: protectedResourceMap,
     extraQueryParameters: {}
   };
 }
@@ -113,6 +112,11 @@ function MSALAngularConfigFactory(): MsalAngularConfiguration {
       multi: true
     },
     {
+      provide: HTTP_INTERCEPTORS,
+      useClass: MsalTokenInterceptorService,
+      multi: true
+    },
+    {
       provide: MSAL_CONFIG,
       useFactory: MSALConfigFactory
     },
@@ -123,7 +127,8 @@ function MSALAngularConfigFactory(): MsalAngularConfiguration {
     MsalService,
     MsalTokenService,
     SignalRService,
-    ComponentStateService
+    ComponentStateService,
+    SettingsDataService
   ],
   exports: [
 
