@@ -41,6 +41,7 @@ import { SignalRService } from './services/signalR/signal-r.service';
 import { ComponentStateService } from './services/component-state-service/component-state.service';
 import { SettingsDataService } from '../app/services/settings-data/settings-data.service';
 import { MsalTokenInterceptorService } from './services/msal-token-interceptor/msal-token-interceptor.service';
+import { LinframesDataService } from './services/linframes-data/linframes-data.service';
 
 export const protectedResourceMap: [string, string[]][] = [
   ['https://graph.microsoft.com/v2.0/me', ['user.read']]
@@ -131,7 +132,8 @@ function MSALAngularConfigFactory(): MsalAngularConfiguration {
     MsalTokenService,
     SignalRService,
     ComponentStateService,
-    SettingsDataService
+    SettingsDataService,
+    LinframesDataService
   ],
   exports: [
 

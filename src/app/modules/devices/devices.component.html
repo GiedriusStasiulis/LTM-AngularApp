@@ -3,7 +3,7 @@
         <div class="frame_table_container" id="frameTable">
             <div *ngIf="devicesComponentState.deviceConnected; then showTable else showInfo"></div>
             <ng-template #showTable>
-                <mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8" #scrollframe>
+                <mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8" id="table">
                     <ng-container matColumnDef="packetNo">
                         <mat-header-cell *matHeaderCellDef mat-sort-header> Packet No. </mat-header-cell>
                         <mat-cell *matCellDef="let element"> {{element.PCKNO}} </mat-cell>
@@ -24,9 +24,19 @@
                         <mat-cell *matCellDef="let element"> {{element.PID_DEC}} </mat-cell>
                     </ng-container>
 
+                    <ng-container matColumnDef="pidName">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> PID Name</mat-header-cell>
+                        <mat-cell *matCellDef="let element"> - </mat-cell>
+                    </ng-container>
+
                     <ng-container matColumnDef="payload0">
                         <mat-header-cell *matHeaderCellDef mat-sort-header> Payload[0] </mat-header-cell>
                         <mat-cell *matCellDef="let element"> {{element.FDATA0}} </mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="payload0Name">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> Payload[0] Name</mat-header-cell>
+                        <mat-cell *matCellDef="let element"> - </mat-cell>
                     </ng-container>
 
                     <ng-container matColumnDef="payload1">
@@ -65,16 +75,15 @@
                     </ng-container>
 
                     <mat-header-row *matHeaderRowDef="columnsToDisplay; sticky: true"></mat-header-row>
-                    <mat-row *matRowDef="let row; columns: columnsToDisplay;" (click)="onRowClicked(row)" [ngClass]="{ 'selected': row === selectedRow }"></mat-row>
+                    <mat-row id="matRow" *matRowDef="let row; columns: columnsToDisplay;" (click)="onRowClicked(row)" [ngClass]="{ 'selected': row === selectedRow }"></mat-row>
 
                     <!--<tr class="mat-row" *matNoDataRow>
                         <td class="mat-cell" colspan="12">No data matching the filter "{{input.value}}"</td>
                     </tr>-->
                 </mat-table>
             </ng-template>
-            <ng-template #showInfo>Please connect to the device to start monitoring frames</ng-template>
         </div>
-
+        <ng-template #showInfo>Please connect to the device to start monitoring frames</ng-template>
         <div class="frame_table_controls_container">
             <div class="device_control_wrapper">
                 <ng-select id="device_select_dropdown" [(ngModel)]="selectedDevice" bindValue="name" [dropdownPosition]="'top'" placeholder="Please select a device">

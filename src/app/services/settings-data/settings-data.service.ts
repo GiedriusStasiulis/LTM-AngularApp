@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { catchError, map, retry, tap } from 'rxjs/operators'; 
+import { catchError, map, tap } from 'rxjs/operators'; 
 import { UserSettingsItem } from 'src/app/models/userSettingsItem';
 
 @Injectable({
@@ -67,8 +67,21 @@ export class SettingsDataService {
     .pipe(  
       map(() => {
         this.userSettingsList = this.userSettingsList$.getValue();
-        this.userSettingsList.push(_userSettingsItem);
-        this.userSettingsList$.next(this.userSettingsList);
+
+        let itemIndex = this.userSettingsList.findIndex(r => r.id === _userSettingsItem.id);
+
+        if(itemIndex == -1)
+        {
+          //Push to array
+          this.userSettingsList.push(_userSettingsItem);
+          this.userSettingsList$.next(this.userSettingsList);
+        }
+        else
+        {
+          //Update
+          this.userSettingsList[itemIndex] = _userSettingsItem;
+          this.userSettingsList$.next(this.userSettingsList);
+        }
       }),
       map(() => _userSettingsItem),  
       catchError(this.handleError)

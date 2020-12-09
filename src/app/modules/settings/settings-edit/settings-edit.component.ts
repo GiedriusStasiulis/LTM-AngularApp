@@ -1,6 +1,6 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MsalService } from '@azure/msal-angular';
 import { Subscription } from 'rxjs';
 import { UserSettingsItem } from 'src/app/models/userSettingsItem';
@@ -22,7 +22,6 @@ export class SettingsEditComponent implements OnInit, OnDestroy {
   userId: string;
   settingsId: string;
   private sub: Subscription;   
-  private sub2: Subscription;   
 
   displayMessage: { [key: string]: string } = {};    
   private validationMessages: { [key: string]: { [key: string]: string } };    
