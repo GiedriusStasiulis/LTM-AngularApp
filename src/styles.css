@@ -163,3 +163,20 @@ body {
     min-width: 400px;
     height: 100%;
 }
+
+.mat-card {
+    background-color: whitesmoke !important;
+    transition: none !important;
+    box-shadow: none !important;
+}
+
+.mat-card-content {
+    color: white;
+    background-color: whitesmoke !important;
+}
+
+.pgr-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center
+}

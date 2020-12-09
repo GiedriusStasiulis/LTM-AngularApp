@@ -1,0 +1,53 @@
+<div class="main_container">
+    <div class="card">
+        <div class="card-header">
+            {{pageTitle}}
+        </div>
+
+        <div class="card-body">
+            <form novalidate (ngSubmit)="saveUserSettingsItem()" [formGroup]="userSettingsItemForm">
+
+                <div class="form-group row mb-2">
+                    <label class="col-md-2 col-form-label" for="pidHexValue">PID Hex value</label>
+                    <div class="col-md-8">
+                        <input class="form-control" id="pidHexValue" type="text" placeholder="PID Hex Value (required)" formControlName="pidHexValue" [ngClass]="{'is-invalid': displayMessage.pidHexValue }" />
+                        <span class="invalid-feedback">{{displayMessage.pidHexValue}}</span>
+                    </div>
+                </div>
+
+                <div class="form-group row mb-2">
+                    <label class="col-md-2 col-form-label" for="pidName">PID Name</label>
+                    <div class="col-md-8">
+                        <input class="form-control" id="pidName" type="text" placeholder="PID Name (required)" formControlName="pidName" [ngClass]="{'is-invalid': displayMessage.pidName}" />
+                        <span class="invalid-feedback">{{displayMessage.pidName}}</span>
+                    </div>
+                </div>
+
+                <div class="form-group row mb-2">
+                    <label class="col-md-2 col-form-label" for="payload0Name">Payload[0] Name</label>
+                    <div class="col-md-8">
+                        <input class="form-control" id="payload0Name" type="text" placeholder="Payload[0] Name (required)" formControlName="payload0Name" [ngClass]="{'is-invalid': displayMessage.payload0Name}" />
+                        <span class="invalid-feedback">{{displayMessage.payload0Name}}</span>
+                    </div>
+                </div>
+
+                <div class="form-group row mb-2">
+                    <div class="offset-md-2 col-md-4">
+                        <button class="btn btn-primary mr-3" style="width:80px;" type="submit" [title]="userSettingsItemForm.valid ? 'Save your entered data' : 'Disabled until the form data is valid'" [disabled]="!userSettingsItemForm.valid">    
+                  Save    
+                </button>
+                        <button class="btn btn-outline-secondary mr-3" style="width:80px;" type="button" title="Cancel your edits" routerLink="/settings">    
+                  Cancel    
+                </button>
+                        <button class="btn btn-outline-warning" *ngIf="pageTitle != 'Create New'" style="width:80px" type="button" title="Delete this product" (click)="deleteUserSettingsItem()">    
+                  Delete    
+                </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="alert alert-danger" *ngIf="errorMessage">{{errorMessage}}
+        </div>
+    </div>
+</div>

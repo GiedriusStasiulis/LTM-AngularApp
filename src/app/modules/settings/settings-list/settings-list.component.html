@@ -1,0 +1,60 @@
+<div class="main_container">
+    <div class="card">
+        <div class="card-header">
+            {{pageTitle}}
+        </div>
+        <div class="card-body">
+            <div class="row" style="margin-bottom:15px;">
+                <div class="col-md-3">
+                    <a class="btn btn-primary mr-3" routerLink="/settings/add">
+                        <i class="fa fa-plus"></i> New setting
+                    </a>
+                </div>
+            </div>
+            <div *ngIf="showSpinner">
+                <mat-card>
+                    <mat-card-content class="spinner">
+                        <mat-progress-spinner class="example-margin" [color]="color" [mode]="mode" [value]="value" [diameter]="diameter"></mat-progress-spinner>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+            <div *ngIf="showSettingsTable">
+                <div class="table-responsive">
+                    <table class="table mb-0" *ngIf="userSettingsItems && userSettingsItems.length">
+                        <thead>
+                            <tr>
+                                <th>PID Hex value</th>
+                                <th>PID Name</th>
+                                <th>Payload[0] Name</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of filteredUserSettingsItems">
+
+                                <td>{{ item.pidHexValue }}</td>
+                                <td>{{ item.pidName }}</td>
+                                <td>{{ item.payload0Name }}</td>
+                                <td>
+                                    <button class="btn btn-outline-primary btn-sm" [routerLink]="['/settings/', item.id, 'edit']">  
+                          <i class="fa fa-edit"></i> Edit  
+                        </button>
+                                </td>
+                                <td>
+                                    <button class="btn btn-outline-danger btn-sm" (click)="deleteUserSettingsItem(item.id, item.userID);">  
+                          <i class="fa fa-trash"></i> Delete  
+                        </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="errorMessage" class="alert alert-danger">
+        Error: {{ errorMessage }}
+    </div>
+
+</div>

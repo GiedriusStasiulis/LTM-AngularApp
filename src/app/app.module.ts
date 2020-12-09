@@ -13,12 +13,17 @@ import { SidebarModule } from './modules/sidebar/sidebar.module';
 import { ToggleSidebarModule } from './modules/toggle-sidebar/toggle-sidebar.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { DevicesModule } from './modules/devices/devices.module';
-import { SettingsModule } from './modules/settings/settings.module';
 import { HeaderModule } from './modules/header/header.module';
+import { SettingsListModule } from './modules/settings/settings-list/settings-list.module';
+import { SettingsEditModule } from './modules/settings/settings-edit/settings-edit.module';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { CommonModule } from '@angular/common';  
+import { RouterModule, Routes } from '@angular/router';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCardModule } from '@angular/material/card';
 
 import {
   MsalModule,
@@ -35,7 +40,6 @@ import { MsalTokenService } from './services/msal-token-service/msal-token.servi
 import { SignalRService } from './services/signalR/signal-r.service';
 import { ComponentStateService } from './services/component-state-service/component-state.service';
 import { SettingsDataService } from '../app/services/settings-data/settings-data.service';
-import { DialogBoxComponent } from './dialog-box/dialog-box.component';
 import { MsalTokenInterceptorService } from './services/msal-token-interceptor/msal-token-interceptor.service';
 
 export const protectedResourceMap: [string, string[]][] = [
@@ -78,20 +82,21 @@ function MSALAngularConfigFactory(): MsalAngularConfiguration {
 @NgModule({
   declarations: [
     AppComponent,
-    DialogBoxComponent
   ],
   imports: [
     BrowserModule,
+    CommonModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     MatSidenavModule,
     DashboardModule,
     SidebarModule,
     HeaderModule,
+    SettingsListModule,
+    SettingsEditModule,
     DevicesModule,
     ToggleSidebarModule,
     MatTabsModule,
-    SettingsModule,
     MatTableModule,
     MatSortModule,
     MsalModule,
@@ -103,7 +108,10 @@ function MSALAngularConfigFactory(): MsalAngularConfiguration {
     NgSelectModule,
     MatInputModule,
     MatButtonModule,
-    MatDialogModule
+    MatDialogModule,
+    RouterModule,
+    MatProgressSpinnerModule,
+    MatCardModule
   ],
   providers: [
     {
