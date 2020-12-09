@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators'; 
+import { catchError, map, retry, tap } from 'rxjs/operators'; 
 import { UserSettingsItem } from 'src/app/models/userSettingsItem';
 
 @Injectable({
@@ -13,7 +13,8 @@ export class SettingsDataService {
   userSettingsList$ = new BehaviorSubject<UserSettingsItem[]>([]);
   userSettingItem$: BehaviorSubject<UserSettingsItem | undefined>;
 
-  private readonly azureUrl: string = "http://localhost:7071/api/";
+  //private readonly azureUrl: string = "http://localhost:7071/api/";
+  private readonly azureUrl: string = "https://ltmfunctionsappv2.azurewebsites.net/api/"; 
 
   constructor(private _httpClient: HttpClient) { 
     this.userSettingItem$ = new BehaviorSubject<UserSettingsItem | undefined>(undefined);

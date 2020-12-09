@@ -1,7 +1,7 @@
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { throwError, Observable, BehaviorSubject, of } from "rxjs";
-import { catchError, filter, take, switchMap, finalize } from "rxjs/operators";
+import { catchError, filter, take, switchMap, finalize, retry } from "rxjs/operators";
 import { MsalService } from '@azure/msal-angular';
 import { AuthResponse } from 'msal';
 
@@ -13,19 +13,16 @@ export class MsalTokenInterceptorService implements HttpInterceptor{
   private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
   private accessScopes = {scopes: ["5d98c088-fcf6-46b5-b2d8-d912c8126c0d/.default"]};
 
-  constructor(private _authService: MsalService) 
-  { 
-    this.getAccessToken();    
-  }
+  constructor(private _authService: MsalService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
- 
+
     if (!req.headers.has('Content-Type')) {
       req = req.clone({
         headers: req.headers.set('Content-Type', 'application/json')
       });
     }
- 
+
     req = this.addAuthenticationToken(req);
  
     return next.handle(req).pipe(
@@ -79,9 +76,7 @@ export class MsalTokenInterceptorService implements HttpInterceptor{
   private addAuthenticationToken(request: HttpRequest<any>): HttpRequest<any> {
     // If we do not have a token yet then we should not set the header.
     // Here we could first retrieve the token from where we store it.
-
-    //console.log("Access token from the interceptop: " + this.token);
-
+    
     if (!this.token) {
       return request;
     }
@@ -91,7 +86,7 @@ export class MsalTokenInterceptorService implements HttpInterceptor{
     });
   }
 
-  private getAccessToken()
+  public getAccessToken()
   {
     this._authService.acquireTokenSilent(this.accessScopes)
     .then((response: AuthResponse) => {

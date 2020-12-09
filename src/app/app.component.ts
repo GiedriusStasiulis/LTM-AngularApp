@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { SidebarService } from 'src/app/services/sidebar.service';
 import { mainContentAnimation } from './animations';
 import { BroadcastService, MsalService } from '@azure/msal-angular';
-import { Logger, CryptoUtils } from 'msal';
+import { Logger, CryptoUtils, AuthResponse } from 'msal';
+import { MsalTokenInterceptorService } from './services/msal-token-interceptor/msal-token-interceptor.service';
 
 @Component({
   selector: 'app-root',
@@ -17,6 +18,10 @@ export class AppComponent implements OnInit
   sidebarState: string;
   loggedIn = false;
   subscription: any;
+
+  private accessScopes = {scopes: ["5d98c088-fcf6-46b5-b2d8-d912c8126c0d/.default"]};
+  private token = "noToken";
+  
   constructor(private _sidebarService: SidebarService, private _broadcastService: BroadcastService, private _authService: MsalService) { }
 
   ngOnInit() {
@@ -29,10 +34,11 @@ export class AppComponent implements OnInit
     this.checkoutAccount();    
 
     this._broadcastService.subscribe('msal:loginSuccess', () => {
-      this.checkoutAccount();        
+      this.checkoutAccount();    
     });
 
     this.subscription =  this._broadcastService.subscribe("msal:acquireTokenSuccess", (payload) => {
+      
     })
 
     this.subscription =  this._broadcastService.subscribe("msal:acquireTokenFailure", (payload) => {

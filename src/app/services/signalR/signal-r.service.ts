@@ -12,9 +12,7 @@ import { SubSink } from 'subsink';
 })
 export class SignalRService {
 
-  //private readonly azureUrl: string = "http://localhost:7071/api/";
   private readonly azureUrl: string = "https://ltmfunctionsappv2.azurewebsites.net/api/"; 
-  //https://ltmfunctionsapp.azurewebsites.net
   private hubConnection: HubConnection | undefined;
 
   subSinkSubscription = new SubSink();

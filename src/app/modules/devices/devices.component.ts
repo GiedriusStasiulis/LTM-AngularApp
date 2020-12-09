@@ -37,11 +37,11 @@ export class DevicesComponent implements OnInit, AfterViewInit {
   timestamp: string = ''; 
 
   devices = [
-        { id: 1, name: 'ESP32_SIM1' },
-        { id: 2, name: 'ESP32_DEV1' }
+        { id: 1, name: 'ESP32SIM1' },
+        { id: 2, name: 'ESP32DEV1' }
     ];
 
-  selectedDevice = this.devices[0];
+  selectedDevice = this.devices[0].name;
 
   constructor(private _signalRService: SignalRService, private _componentStateService: ComponentStateService) 
   {
@@ -89,7 +89,7 @@ export class DevicesComponent implements OnInit, AfterViewInit {
   //SignalR Service functions
   addUserToSignalRGroup()
   {
-    this._signalRService.addUserToSignalRGroup(this.devicesComponentState.deviceId).subscribe(results => {
+    this._signalRService.addUserToSignalRGroup("ESP32SIM1").subscribe(results => {
         console.log("Results: " + JSON.stringify(results));
         
         this._signalRService.addDeviceConnection();
@@ -104,7 +104,7 @@ export class DevicesComponent implements OnInit, AfterViewInit {
 
   removeUserFromSignalRGroup()
   {    
-    this._signalRService.removeUserFromSignalRGroup(this.devicesComponentState.deviceId).subscribe(results => {
+    this._signalRService.removeUserFromSignalRGroup(this.selectedDevice).subscribe(results => {
       console.log("Results: " + JSON.stringify(results));
       
       this._signalRService.removeDeviceConnection();   

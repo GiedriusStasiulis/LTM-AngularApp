@@ -116,11 +116,6 @@ function MSALAngularConfigFactory(): MsalAngularConfiguration {
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: MsalInterceptor,
-      multi: true
-    },
-    {
-      provide: HTTP_INTERCEPTORS,
       useClass: MsalTokenInterceptorService,
       multi: true
     },

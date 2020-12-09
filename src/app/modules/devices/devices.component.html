@@ -77,11 +77,13 @@
 
         <div class="frame_table_controls_container">
             <div class="device_control_wrapper">
-                <!--Using ng-option and for loop-->
-                <ng-select [(ngModel)]="selectedDevice">
+                <ng-select id="device_select_dropdown" [(ngModel)]="selectedDevice" bindValue="name" [dropdownPosition]="'top'" placeholder="Please select a device">
                     <ng-option *ngFor="let device of devices" [value]="device.name">{{device.name}}</ng-option>
                 </ng-select>
-                <button type="button" class="btn btn-primary ml-1" (click)="addUserToSignalRGroup()">Connect</button>
+                <div *ngIf="!devicesComponentState.deviceConnected">
+                    <button type="button" class="btn btn-primary ml-1" (click)="addUserToSignalRGroup()">Connect</button>
+                </div>
+
                 <button type="button" class="btn btn-primary ml-1" (click)="removeUserFromSignalRGroup()">Disconnect</button>
             </div>
             <div class="filtering_control_wrapper"></div>
