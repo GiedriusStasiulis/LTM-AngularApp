@@ -8,23 +8,26 @@ import { ComponentStateService } from '../../services/component-state-service/co
 import { DevicesComponentState } from 'src/app/models/component-states/devices-state';
 import { ComponentStateType } from 'src/app/models/component-states/component-state-type-enum';
 import { LinframesDataService } from 'src/app/services/linframes-data/linframes-data.service';
+import { TableVirtualScrollDataSource } from 'ng-table-virtual-scroll';
+import { BehaviorSubject } from 'rxjs';
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 
 const ELEMENT_DATA: LinFrame[] = [];
+
 
 @Component({
   selector: 'app-devices',
   templateUrl: './devices.component.html',
   styleUrls: ['./devices.component.css']
 })
-export class DevicesComponent implements OnInit, AfterViewInit {
+export class DevicesComponent implements OnInit {
 
   //Table variables
   @ViewChild(MatSort) sort: MatSort;
-  tableScrollContainer: HTMLElement;
+
   tableContainer: HTMLElement;
   table: HTMLElement;
 
-  dataSource: MatTableDataSource<LinFrame>;
   displayedColumns: string[] = ['packetNo','frameNo', 'pidHex', 'pidDec', 'pidName', 'payload0', 'payload0Name', 'payload1', 'payload2', 'payload3', 'payload4', 'payload5', 'payload6', 'payload7'];
   columnsToDisplay: string[] = this.displayedColumns.slice();
   selectedRow : boolean;  
@@ -47,13 +50,13 @@ export class DevicesComponent implements OnInit, AfterViewInit {
         { id: 2, name: 'ESP32DEV1' }
     ];
 
+  //observableData = new BehaviorSubject<number[]>([]);
+  linFramesObservableList = new BehaviorSubject<LinFrame[]>([]);
+
   selectedDevice = this.devices[0].name;
 
   constructor(private _signalRService: SignalRService, private _componentStateService: ComponentStateService, private _linframesDataService: LinframesDataService) 
-  {
-    this.dataSource = new MatTableDataSource(ELEMENT_DATA);
-    this.dataSource.sort = this.sort;    
-  }  
+  {  }  
   
   ngOnInit() 
   {   
@@ -64,27 +67,30 @@ export class DevicesComponent implements OnInit, AfterViewInit {
       this.initComponentState();
     }    
 
+    if(this.devicesComponentState.deviceConnected)
+    {
+      //Fetch previous frames for current session before appending live frames?
+    }
+
     this.subSinkSubscription.sink = this._signalRService.messageObservable$.subscribe(async message => {
 
       var elementsToPush: LinFrame[] = this.parseFramePacket(JSON.parse(message));
 
       this.showDataInTable(elementsToPush);
-    });    
+    }); 
   }
 
-  ngAfterViewInit() 
+  /*ngAfterViewInit() 
   {    
     if(this.devicesComponentState.deviceConnected)
     {
       this.dataSource.sort = this.sort;
     } 
-  }
+  }*/
 
   ngOnDestroy() {
     this.saveComponentState(this.devicesComponentState);
   }
-
-
 
   //SignalR Service functions
   addUserToSignalRGroup()
@@ -117,19 +123,16 @@ export class DevicesComponent implements OnInit, AfterViewInit {
     );   
   }
 
-
-
   //Table functions
-
   async showDataInTable(_linFrames: LinFrame[])
   {
-    this.tableContainer = document.getElementById("frameTable");
-    this.table = document.getElementById("table");
+    this.tableContainer = document.getElementById("tableContainer");
+    this.table = document.getElementById("vertical_scroll_table");
 
     for(let i = 0; i < _linFrames.length; i++)
-    {      
-      ELEMENT_DATA.push(_linFrames[i]);        
-      this.dataSource = new MatTableDataSource(ELEMENT_DATA);
+    {
+      const NEW_FRAMES = this.linFramesObservableList.value.concat(_linFrames[i]);
+      this.linFramesObservableList.next(NEW_FRAMES);
 
       if(this.devicesComponentState.alwaysScrollToBottom)
       {
@@ -139,26 +142,8 @@ export class DevicesComponent implements OnInit, AfterViewInit {
         }          
       }
 
-      await this.delay(0.0001);
-      //await this.delay(0.01);
-
-      /*setTimeout(() => 
-      {
-        ELEMENT_DATA.push(_linFrames[i]);        
-        this.dataSource = new MatTableDataSource(ELEMENT_DATA);
-
-        if(this.devicesComponentState.alwaysScrollToBottom)
-        {
-          if(this.table.scrollHeight > this.tableContainer.clientHeight)
-          {
-            this.tableContainer.scrollTop = this.tableContainer.scrollHeight;
-          }          
-        }
-      },
-      0.001);*/
-    } 
-
-    this.tableContainer.scrollTop = this.tableContainer.scrollHeight;
+      await this.delay(1);
+    }
   }
 
   onRowClicked(_row: boolean) 
@@ -173,13 +158,11 @@ export class DevicesComponent implements OnInit, AfterViewInit {
     } 
   }
 
-  applyFilter(_event: Event) {
+  /*applyFilter(_event: Event) {
     const filterValue = (_event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
-  }
+  }*/
 
-  
-  
   //Data functions
   parseFramePacket(message: any)
   {

@@ -1,86 +1,150 @@
 <div class="content_container">
-    <div class="device_tab_container">
-        <div class="frame_table_container" id="frameTable">
+    <div id="frame_table_sticky_header_area">
+        <table class="table">
+            <thead id="frame_table_sticky_header">
+                <tr>
+                    <th>Packet No.</th>
+                    <th>Frame No.</th>
+                    <th>PID (Hex)</th>
+                    <th>PID (Dec)</th>
+                    <th>PID Name</th>
+                    <th>Payload[0]</th>
+                    <th>Payload[0] Name</th>
+                    <th>Payload[1]</th>
+                    <th>Payload[2]</th>
+                    <th>Payload[3]</th>
+                    <th>Payload[4]</th>
+                    <th>Payload[5]</th>
+                    <th>Payload[6]</th>
+                    <th>Payload[7]</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div id="devices_component_container">
+        <cdk-virtual-scroll-viewport [itemSize]="20" id="tableContainer">
+            <table class="table" id="vertical_scroll_table">
+                <thead id="frame_table_sticky_header" class="hide">
+                    <tr>
+                        <th>Packet No.</th>
+                        <th>Frame No.</th>
+                        <th>PID (Hex)</th>
+                        <th>PID (Dec)</th>
+                        <th>PID Name</th>
+                        <th>Payload[0]</th>
+                        <th>Payload[0] Name</th>
+                        <th>Payload[1]</th>
+                        <th>Payload[2]</th>
+                        <th>Payload[3]</th>
+                        <th>Payload[4]</th>
+                        <th>Payload[5]</th>
+                        <th>Payload[6]</th>
+                        <th>Payload[7]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *cdkVirtualFor="let element of linFramesObservableList | async" class="item">
+                        <td>{{element.PCKNO}}</td>
+                        <td>{{element.FNO}}</td>
+                        <td>{{element.PID_HEX}}</td>
+                        <td>{{element.PID_DEC}}</td>
+                        <td> - </td>
+                        <td>{{element.FDATA0}}</td>
+                        <td> - </td>
+                        <td>{{element.FDATA1}}</td>
+                        <td>{{element.FDATA2}}</td>
+                        <td>{{element.FDATA3}}</td>
+                        <td>{{element.FDATA4}}</td>
+                        <td>{{element.FDATA5}}</td>
+                        <td>{{element.FDATA6}}</td>
+                        <td>{{element.FDATA7}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </cdk-virtual-scroll-viewport>
+        <div id="device_controls_container">
+            <div class="device_control_wrapper">
+                <ng-select id="device_select_dropdown" [(ngModel)]="selectedDevice" bindValue="name" [dropdownPosition]="'top'" placeholder="Please select a device">
+                    <ng-option *ngFor="let device of devices" [value]="device.name">{{device.name}}</ng-option>
+                </ng-select>
+                <div *ngIf="!devicesComponentState.deviceConnected">
+                    <button type="button" class="btn btn-primary ml-1" (click)="addUserToSignalRGroup()">Connect</button>
+                </div>
+
+                <button type="button" class="btn btn-primary ml-1" (click)="removeUserFromSignalRGroup()">Disconnect</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!--<div class="device_tab_container">
+        <div class="frame_table_container">
             <div *ngIf="devicesComponentState.deviceConnected; then showTable else showInfo"></div>
             <ng-template #showTable>
-                <mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8" id="table">
-                    <ng-container matColumnDef="packetNo">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> Packet No. </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.PCKNO}} </mat-cell>
-                    </ng-container>
 
-                    <ng-container matColumnDef="frameNo">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> Frame No. </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.FNO}} </mat-cell>
-                    </ng-container>
+                <table class="table">
+                    <thead id="frame_table_header">
+                        <tr>
+                            <th>Packet No.</th>
+                            <th>Frame No.</th>
+                            <th>PID (Hex)</th>
+                            <th>PID (Dec)</th>
+                            <th>PID Name</th>
+                            <th>Payload[0]</th>
+                            <th>Payload[0] Name</th>
+                            <th>Payload[1]</th>
+                            <th>Payload[2]</th>
+                            <th>Payload[3]</th>
+                            <th>Payload[4]</th>
+                            <th>Payload[5]</th>
+                            <th>Payload[6]</th>
+                            <th>Payload[7]</th>
+                        </tr>
+                    </thead>
+                </table>
 
-                    <ng-container matColumnDef="pidHex">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> PID (Hex)</mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.PID_HEX}} </mat-cell>
-                    </ng-container>
+                <cdk-virtual-scroll-viewport [itemSize]="20" id="tableContainer">
+                    <table class="table" id="vertical_scroll_table">
+                        <thead id="frame_table_header_hide">
+                            <tr>
+                                <th>Packet No.</th>
+                                <th>Frame No.</th>
+                                <th>PID (Hex)</th>
+                                <th>PID (Dec)</th>
+                                <th>PID Name</th>
+                                <th>Payload[0]</th>
+                                <th>Payload[0] Name</th>
+                                <th>Payload[1]</th>
+                                <th>Payload[2]</th>
+                                <th>Payload[3]</th>
+                                <th>Payload[4]</th>
+                                <th>Payload[5]</th>
+                                <th>Payload[6]</th>
+                                <th>Payload[7]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *cdkVirtualFor="let element of linFramesObservableList | async" class="item">
+                                <td>{{element.PCKNO}}</td>
+                                <td>{{element.FNO}}</td>
+                                <td>{{element.PID_HEX}}</td>
+                                <td>{{element.PID_DEC}}</td>
+                                <td> - </td>
+                                <td>{{element.FDATA0}}</td>
+                                <td> - </td>
+                                <td>{{element.FDATA1}}</td>
+                                <td>{{element.FDATA2}}</td>
+                                <td>{{element.FDATA3}}</td>
+                                <td>{{element.FDATA4}}</td>
+                                <td>{{element.FDATA5}}</td>
+                                <td>{{element.FDATA6}}</td>
+                                <td>{{element.FDATA7}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </cdk-virtual-scroll-viewport>
 
-                    <ng-container matColumnDef="pidDec">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> PID (Dec)</mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.PID_DEC}} </mat-cell>
-                    </ng-container>
-
-                    <ng-container matColumnDef="pidName">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> PID Name</mat-header-cell>
-                        <mat-cell *matCellDef="let element"> - </mat-cell>
-                    </ng-container>
-
-                    <ng-container matColumnDef="payload0">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> Payload[0] </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.FDATA0}} </mat-cell>
-                    </ng-container>
-
-                    <ng-container matColumnDef="payload0Name">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> Payload[0] Name</mat-header-cell>
-                        <mat-cell *matCellDef="let element"> - </mat-cell>
-                    </ng-container>
-
-                    <ng-container matColumnDef="payload1">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> Payload[1] </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.FDATA1}} </mat-cell>
-                    </ng-container>
-
-                    <ng-container matColumnDef="payload2">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> Payload[2] </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.FDATA2}} </mat-cell>
-                    </ng-container>
-
-                    <ng-container matColumnDef="payload3">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> Payload[3] </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.FDATA3}} </mat-cell>
-                    </ng-container>
-
-                    <ng-container matColumnDef="payload4">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> Payload[4] </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.FDATA4}} </mat-cell>
-                    </ng-container>
-
-                    <ng-container matColumnDef="payload5">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> Payload[5] </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.FDATA5}} </mat-cell>
-                    </ng-container>
-
-                    <ng-container matColumnDef="payload6">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> Payload[6] </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.FDATA6}} </mat-cell>
-                    </ng-container>
-
-                    <ng-container matColumnDef="payload7">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> Payload[7] </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.FDATA7}} </mat-cell>
-                    </ng-container>
-
-                    <mat-header-row *matHeaderRowDef="columnsToDisplay; sticky: true"></mat-header-row>
-                    <mat-row id="matRow" *matRowDef="let row; columns: columnsToDisplay;" (click)="onRowClicked(row)" [ngClass]="{ 'selected': row === selectedRow }"></mat-row>
-
-                    <!--<tr class="mat-row" *matNoDataRow>
-                        <td class="mat-cell" colspan="12">No data matching the filter "{{input.value}}"</td>
-                    </tr>-->
-                </mat-table>
             </ng-template>
         </div>
         <ng-template #showInfo>Please connect to the device to start monitoring frames</ng-template>
@@ -97,5 +161,5 @@
             </div>
             <div class="filtering_control_wrapper"></div>
         </div>
-    </div>
+    </div>-->
 </div>

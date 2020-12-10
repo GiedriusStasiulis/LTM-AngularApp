@@ -11,6 +11,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 @NgModule({
   declarations: [DevicesComponent],
@@ -22,7 +23,8 @@ import { FormsModule } from '@angular/forms';
     MatSelectModule,
     MatFormFieldModule,
     NgSelectModule,
-    FormsModule
+    FormsModule,
+    ScrollingModule
   ],
   exports: [],
   providers: [

@@ -24,10 +24,11 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { TableVirtualScrollModule } from 'ng-table-virtual-scroll';
 
 import {
   MsalModule,
-  MsalInterceptor,
   MSAL_CONFIG,
   MSAL_CONFIG_ANGULAR,
   MsalService,
@@ -112,7 +113,9 @@ function MSALAngularConfigFactory(): MsalAngularConfiguration {
     MatDialogModule,
     RouterModule,
     MatProgressSpinnerModule,
-    MatCardModule
+    MatCardModule,
+    ScrollingModule,
+    TableVirtualScrollModule
   ],
   providers: [
     {
