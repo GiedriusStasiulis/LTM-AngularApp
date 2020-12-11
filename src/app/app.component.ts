@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { SidebarService } from 'src/app/services/sidebar.service';
 import { mainContentAnimation } from './animations';
-import { BroadcastService, MsalService } from '@azure/msal-angular';
-import { Logger, CryptoUtils, AuthResponse } from 'msal';
-import { MsalTokenInterceptorService } from './services/msal-token-interceptor/msal-token-interceptor.service';
+import { MsalService, MsalBroadcastService, MSAL_GUARD_CONFIG, MsalGuardConfiguration } from '@azure/msal-angular';
+import { Subject } from 'rxjs';
+import { EventMessage, EventType, InteractionType } from '@azure/msal-browser';
+import { filter, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -16,13 +17,15 @@ import { MsalTokenInterceptorService } from './services/msal-token-interceptor/m
 export class AppComponent implements OnInit
 {
   sidebarState: string;
+  isIframe = false;
   loggedIn = false;
-  subscription: any;
-
-  private accessScopes = {scopes: ["5d98c088-fcf6-46b5-b2d8-d912c8126c0d/.default"]};
-  private token = "noToken";
+  private readonly _destroying$ = new Subject<void>();
   
-  constructor(private _sidebarService: SidebarService, private _broadcastService: BroadcastService, private _authService: MsalService) { }
+  constructor(@Inject(MSAL_GUARD_CONFIG) private _msalGuardConfig: MsalGuardConfiguration, 
+              private _sidebarService: SidebarService, 
+              private _broadcastService: MsalBroadcastService, 
+              private _authService: MsalService) 
+  { }
 
   ngOnInit() {
 
@@ -31,67 +34,41 @@ export class AppComponent implements OnInit
         this.sidebarState = newState;
       });
 
-    this.checkoutAccount();    
+    this.isIframe = window !== window.parent && !window.opener;
 
-    this._broadcastService.subscribe('msal:loginSuccess', () => {
-      this.checkoutAccount();    
-    });
+    this.checkAccount();
 
-    this.subscription =  this._broadcastService.subscribe("msal:acquireTokenSuccess", (payload) => {
-      
-    })
-
-    this.subscription =  this._broadcastService.subscribe("msal:acquireTokenFailure", (payload) => {
-    });
-
-    this._authService.handleRedirectCallback((authError, response) => {
-      if (authError) {
-        console.error('Redirect Error: ', authError.errorMessage);
-        return;
-      }
-
-      console.log('Redirect Success: ', response);
-    });
-
-    this._authService.setLogger(new Logger((logLevel, message, piiEnabled) => {
-      console.log('MSAL Logging: ', message);
-    }, {
-      correlationId: CryptoUtils.createNewGuid(),
-      piiLoggingEnabled: false
-    }));
-
-    /*if(!this.loggedIn)
-    {
-      //this.login();
-    }   */ 
+    //Get logged in user id
+  
+    this._broadcastService.msalSubject$
+      .pipe(
+        filter((msg: EventMessage) => msg.eventType === EventType.LOGIN_SUCCESS || msg.eventType === EventType.ACQUIRE_TOKEN_SUCCESS),
+          takeUntil(this._destroying$)
+        )
+      .subscribe(() => {
+          this.checkAccount();
+      });
   }
 
-  checkoutAccount() {
-    this.loggedIn = !!this._authService.getAccount();
+  checkAccount() {
+    this.loggedIn = this._authService.instance.getAllAccounts().length > 0;
   }
 
   login() {
-    const isIE = window.navigator.userAgent.indexOf('MSIE ') > -1 || window.navigator.userAgent.indexOf('Trident/') > -1;
-
-    if (isIE) {
-      this._authService.loginRedirect();
+    if (this._msalGuardConfig.interactionType === InteractionType.Popup) {
+      this._authService.loginPopup({...this._msalGuardConfig.authRequest})
+        .subscribe(() => this.checkAccount());
     } else {
-      this._authService.loginPopup();
+      this._authService.loginRedirect({...this._msalGuardConfig.authRequest});
     }
   }
 
   logout() {
-    localStorage.clear();
-    this._authService.logout();    
-  } 
-
-  ngOnDestroy() {
-
     this._authService.logout();
+  }
 
-    this._broadcastService.getMSALSubject().next(1);
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
+  ngOnDestroy(): void {
+    this._destroying$.next(null);
+    this._destroying$.complete();
   }
 }

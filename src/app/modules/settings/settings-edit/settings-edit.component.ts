@@ -51,10 +51,10 @@ export class SettingsEditComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
-    if(this.userId == null)
+    /*if(this.userId == null)
     {
       this.userId = this._authService.getAccount().accountIdentifier;
-    }
+    }*/
 
     this.tranMode = "new";    
     this.userSettingsItemForm = this._fb.group({    

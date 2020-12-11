@@ -1,15 +1,34 @@
-import { HttpErrorResponse, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { from, of, throwError } from "rxjs";
+import { from, Observable, of, throwError } from "rxjs";
+import * as msal from "@azure/msal-browser";
 import { MsalService } from '@azure/msal-angular';
-import { AuthResponse, ClientAuthError } from 'msal';
-import { catchError } from 'rxjs/operators';
-import { error } from 'protractor';
+import { resolve } from 'dns';
+import { BrowserCacheLocation } from '@azure/msal-browser';
+
+const isIE = window.navigator.userAgent.indexOf("MSIE ") > -1 || window.navigator.userAgent.indexOf("Trident/") > -1;
+
+const msalConfig = {
+  auth: {
+    clientId: '5d98c088-fcf6-46b5-b2d8-d912c8126c0d',
+      authority: 'https://login.microsoftonline.com/7d980800-3399-486f-9751-570df69d59b0',
+      redirectUri: 'http://localhost:4200',
+      postLogoutRedirectUri: 'http://localhost:4200',
+      navigateToLoginRequestUrl: true
+  },
+  cache: {
+    cacheLocation: BrowserCacheLocation.LocalStorage,
+      storeAuthStateInCookie: isIE, // set to true for IE 11
+  }
+};
+
+const myMSALObj = new msal.PublicClientApplication(msalConfig); 
 
 @Injectable()
 export class MsalTokenInterceptorService implements HttpInterceptor{
 
   private accessScopes = {scopes: ["5d98c088-fcf6-46b5-b2d8-d912c8126c0d/.default"]};
+  private signedInAccount : any;
 
   constructor(private _authService: MsalService) {}
 
@@ -25,7 +44,7 @@ export class MsalTokenInterceptorService implements HttpInterceptor{
       });
     }
 
-    let authToken = await this.getAuthHeader();
+    let authToken = await this.getAuthHeader(req);
 
     const authReq = req.clone({
       setHeaders: {
@@ -36,32 +55,46 @@ export class MsalTokenInterceptorService implements HttpInterceptor{
     return next.handle(authReq).toPromise();
   }
 
-  async getAuthHeader(): Promise<string>
+  getSignedInAccount()
   {
+    const currentAccounts = this._authService.instance.getAllAccounts();
+    if(!currentAccounts || currentAccounts.length === 0)
+    {
+      //No user logged in!
+      return;
+    }
+    else if(currentAccounts.length > 1)
+    {
+      this.signedInAccount = currentAccounts[0];
+    }
+  }
+
+  async getAuthHeader(request: any): Promise<string>
+  {
+    this.getSignedInAccount();
+
+    const silentRequest = {
+      account: this.signedInAccount,
+      scopes: ["5d98c088-fcf6-46b5-b2d8-d912c8126c0d/.default"]
+    }
+
     return new Promise<string>(resolve => {
+      this._authService.acquireTokenSilent(silentRequest).subscribe(response => {
+        const accessToken = response.accessToken;
+        const authHeader = `Bearer ${accessToken}`;
+        resolve(authHeader);
+      })
+    })
+
+    //return null;
+
+    /*return new Promise<string>(resolve => {
       this._authService.acquireTokenSilent(this.accessScopes)
       .then((response: AuthResponse) => {
           const accessToken = response.accessToken;
           const authHeader = `Bearer ${accessToken}`;
           resolve(authHeader);
-      })
-      .catch(
-        catchError((error: ClientAuthError) => {
-
-          console.log("ClientAuthError caught!")
-
-          return new Promise<string>(resolve => {
-            this._authService.acquireTokenPopup(this.accessScopes)
-            .then((response: AuthResponse) => {
-              const accessToken = response.accessToken;
-              const authHeader = `Bearer ${accessToken}`;
-              resolve(authHeader);
-
-              throwError(error);
-            })
-          })          
-        })
-      );      
-    });
+      })   
+    });*/
   }
 }

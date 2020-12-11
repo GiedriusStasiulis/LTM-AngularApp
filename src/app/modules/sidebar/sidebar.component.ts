@@ -27,7 +27,7 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit() {
 
-    this.getProfile();
+    //this.getProfile();
 
     this._sidebarService.sidebarStateObservable$.
       subscribe((newState: string) => {
@@ -46,7 +46,7 @@ export class SidebarComponent implements OnInit {
   }
 
   getProfile() {
-    this.profileName = this._authService.getAccount().name;
+    //this.profileName = this._authService.getAccount().name;
   }
 
   logout() {

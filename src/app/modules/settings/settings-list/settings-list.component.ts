@@ -81,7 +81,7 @@ export class SettingsListComponent implements OnInit{
     this.settingsComponentState = new SettingsComponentState();
 
     //Set default properties
-    this.settingsComponentState.userId = this._authService.getAccount().accountIdentifier;
+    //this.settingsComponentState.userId = this._authService.getAccount().accountIdentifier;
   }
 
   saveComponentState(_settingsComponentState: SettingsComponentState)

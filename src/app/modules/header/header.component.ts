@@ -15,11 +15,11 @@ export class HeaderComponent implements OnInit {
   constructor(private _authService: MsalService) { }
 
   ngOnInit() {
-    this.getProfile();
+    //this.getProfile();
   }
 
   getProfile() {
-    this.profileName = this._authService.getAccount().name;
+    //this.profileName = this._authService.getAccount().name;
   }
 
   logout() {

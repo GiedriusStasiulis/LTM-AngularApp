@@ -4,7 +4,6 @@ import { DevicesComponent } from './devices.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule } from '@angular/material/sort';
-import { MsalTokenService } from 'src/app/services/msal-token-service/msal-token.service';
 import { SignalRService } from 'src/app/services/signalR/signal-r.service';
 import { ComponentStateService } from '../../services/component-state-service/component-state.service';
 import { MatSelectModule } from '@angular/material/select';
@@ -28,7 +27,6 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
   ],
   exports: [],
   providers: [
-    MsalTokenService,
     SignalRService,
     ComponentStateService
   ]

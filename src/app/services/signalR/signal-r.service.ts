@@ -4,7 +4,6 @@ import { Subject, Observable } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { SignalRConnectionInfo } from 'src/app/models/signal-r-connection-info';
 import * as signalR from '@aspnet/signalr';
-import { MsalTokenService } from '../msal-token-service/msal-token.service';
 import { SubSink } from 'subsink';
 
 @Injectable({

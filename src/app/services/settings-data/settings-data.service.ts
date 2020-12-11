@@ -26,6 +26,7 @@ export class SettingsDataService {
     if(this.userSettingsList$.getValue().length == 0)
     {
       let requestUrl: string = `${this.azureUrl}GetAllUserSettings/${_userID}`;
+      //let requestUrl: string = `${this.azureUrl}GetAllUserSettings/712eafd8-e77b-4c6b-b6c2-294b9e699da8`;
       return this._httpClient.get<UserSettingsItem[]>(requestUrl)
       .pipe(
         tap((response: UserSettingsItem[]) => {
