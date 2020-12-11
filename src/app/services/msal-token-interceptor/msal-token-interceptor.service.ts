@@ -1,8 +1,10 @@
-import { HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import { HttpErrorResponse, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { from } from "rxjs";
+import { from, of, throwError } from "rxjs";
 import { MsalService } from '@azure/msal-angular';
-import { AuthResponse } from 'msal';
+import { AuthResponse, ClientAuthError } from 'msal';
+import { catchError } from 'rxjs/operators';
+import { error } from 'protractor';
 
 @Injectable()
 export class MsalTokenInterceptorService implements HttpInterceptor{
@@ -42,7 +44,24 @@ export class MsalTokenInterceptorService implements HttpInterceptor{
           const accessToken = response.accessToken;
           const authHeader = `Bearer ${accessToken}`;
           resolve(authHeader);
-      });      
+      })
+      .catch(
+        catchError((error: ClientAuthError) => {
+
+          console.log("ClientAuthError caught!")
+
+          return new Promise<string>(resolve => {
+            this._authService.acquireTokenPopup(this.accessScopes)
+            .then((response: AuthResponse) => {
+              const accessToken = response.accessToken;
+              const authHeader = `Bearer ${accessToken}`;
+              resolve(authHeader);
+
+              throwError(error);
+            })
+          })          
+        })
+      );      
     });
   }
 }

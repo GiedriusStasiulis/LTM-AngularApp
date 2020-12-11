@@ -1,5 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { LinFrame } from '../../models/linFrame'
 import { MatSort } from '@angular/material/sort';
 import { SubSink } from 'subsink/dist/subsink';
@@ -8,12 +7,7 @@ import { ComponentStateService } from '../../services/component-state-service/co
 import { DevicesComponentState } from 'src/app/models/component-states/devices-state';
 import { ComponentStateType } from 'src/app/models/component-states/component-state-type-enum';
 import { LinframesDataService } from 'src/app/services/linframes-data/linframes-data.service';
-import { TableVirtualScrollDataSource } from 'ng-table-virtual-scroll';
 import { BehaviorSubject } from 'rxjs';
-import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-
-const ELEMENT_DATA: LinFrame[] = [];
-
 
 @Component({
   selector: 'app-devices',
@@ -34,8 +28,10 @@ export class DevicesComponent implements OnInit {
 
   alwaysScrollToBottom: boolean;
 
-  //SignalR variables
-  subSinkSubscription = new SubSink();
+  //Subscription
+  signalRMessagesSub = new SubSink();
+  linframesDataServiceSub = new SubSink();
+
   signalRServiceStarted: boolean = false;
   messages: string[] = [];
 
@@ -64,20 +60,30 @@ export class DevicesComponent implements OnInit {
 
     if(this.devicesComponentState == null)
     {
+      //New component instance, fresh browser open
       this.initComponentState();
     }    
+
+    //Check if sessionStorage contains session ids
 
     if(this.devicesComponentState.deviceConnected)
     {
       //Fetch previous frames for current session before appending live frames?
     }
 
-    this.subSinkSubscription.sink = this._signalRService.messageObservable$.subscribe(async message => {
+    //One sub to push frames to linframes-data.service
+    this.signalRMessagesSub.sink = this._signalRService.messageObservable$.subscribe(async message => {
 
       var elementsToPush: LinFrame[] = this.parseFramePacket(JSON.parse(message));
-
-      this.showDataInTable(elementsToPush);
+      this._linframesDataService.pushFramesToObservable(elementsToPush);
     }); 
+
+    //Second one to observe the frames in linframes-data.service
+    this.linframesDataServiceSub.sink = this._linframesDataService.linFramesList$.subscribe(async frames => {
+
+      var framesToLoad: LinFrame[] = frames;
+      this.showDataInTable(framesToLoad);
+    });    
   }
 
   /*ngAfterViewInit() 
@@ -90,6 +96,7 @@ export class DevicesComponent implements OnInit {
 
   ngOnDestroy() {
     this.saveComponentState(this.devicesComponentState);
+    this.signalRMessagesSub.unsubscribe();
   }
 
   //SignalR Service functions
@@ -142,8 +149,10 @@ export class DevicesComponent implements OnInit {
         }          
       }
 
-      await this.delay(1);
+      await this.delay(0.5);
     }
+
+    this.tableContainer.scrollTop = this.tableContainer.scrollHeight;
   }
 
   onRowClicked(_row: boolean) 
@@ -169,8 +178,9 @@ export class DevicesComponent implements OnInit {
     //Get sessionID
     if(message.PCKNO == 1)
     {
-      this.devicesComponentState.sessionId = message.DEVID;
-      console.log(this.devicesComponentState.sessionId);
+      this.devicesComponentState.sessionIds.push(message.DEVID);
+      this.saveComponentState(this.devicesComponentState);
+      console.log(this.devicesComponentState.sessionIds.forEach);      
     }
 
     const LIN_FRAMES: LinFrame[] = [];
@@ -210,7 +220,7 @@ export class DevicesComponent implements OnInit {
     //Set default properties
     this.devicesComponentState.deviceConnected = true;
     this.devicesComponentState.deviceId = "ESP32SIM1";
-    this.devicesComponentState.sessionId = "ESP32SIM1_1607531709";
+    this.devicesComponentState.sessionIds = [];
     this.devicesComponentState.alwaysScrollToBottom = true;
   }
 

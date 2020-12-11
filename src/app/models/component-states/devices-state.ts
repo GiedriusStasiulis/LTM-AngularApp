@@ -4,6 +4,6 @@ export class DevicesComponentState extends ComponentState
 {
     deviceId: string;
     deviceConnected: boolean;
-    sessionId: string;
+    sessionIds: string[];
     alwaysScrollToBottom: boolean;
 }

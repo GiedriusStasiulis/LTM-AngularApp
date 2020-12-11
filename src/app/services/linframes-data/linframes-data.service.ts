@@ -16,6 +16,11 @@ export class LinframesDataService {
 
   constructor(private _httpClient: HttpClient) { }
 
+  pushFramesToObservable(_linFrames: LinFrame[])
+  {
+    this.linFramesList$.next(_linFrames);
+  }
+
   getAllFramesForSession(_sessionID: string): Observable<LinFrame[]>
   {
     if(this.linFramesList$.getValue().length ==0)
@@ -28,6 +33,9 @@ export class LinframesDataService {
         }),
         catchError(this.handleError)
       );  
+    }
+    else{
+      
     }
 
     return this.linFramesList$.asObservable();
