@@ -18,7 +18,8 @@ export class LinframesDataService {
 
   pushFramesToObservable(_linFrames: LinFrame[])
   {
-    this.linFramesList$.next(_linFrames);
+    const NEW_FRAMES = this.linFramesList$.value.concat(_linFrames);
+    this.linFramesList$.next(NEW_FRAMES);
   }
 
   getAllFramesForSession(_sessionID: string): Observable<LinFrame[]>
@@ -33,9 +34,6 @@ export class LinframesDataService {
         }),
         catchError(this.handleError)
       );  
-    }
-    else{
-      
     }
 
     return this.linFramesList$.asObservable();

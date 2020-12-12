@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { MsalService } from '@azure/msal-angular';
+import { AccountInfo } from '@azure/msal-browser';
 import { ComponentStateType } from 'src/app/models/component-states/component-state-type-enum';
 import { SettingsComponentState } from 'src/app/models/component-states/settings-state';
 import { UserSettingsItem } from 'src/app/models/userSettingsItem';
@@ -81,7 +82,7 @@ export class SettingsListComponent implements OnInit{
     this.settingsComponentState = new SettingsComponentState();
 
     //Set default properties
-    //this.settingsComponentState.userId = this._authService.getAccount().accountIdentifier;
+    this.settingsComponentState.userId = this.getLoggedInAccountID();
   }
 
   saveComponentState(_settingsComponentState: SettingsComponentState)
@@ -92,5 +93,13 @@ export class SettingsListComponent implements OnInit{
   loadComponentState()
   {
     this.settingsComponentState = this._componentStateService.loadComponentState(ComponentStateType.SettingsComponentState);
+  }
+
+  getLoggedInAccountID()
+  {
+    const localAccount = sessionStorage.getItem("signedInAccount");
+    var accInfo = JSON.parse(localAccount);
+
+    return accInfo.localAccountId;
   }
 }

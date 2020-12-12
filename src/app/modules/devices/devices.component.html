@@ -3,6 +3,7 @@
         <table class="table">
             <thead id="frame_table_sticky_header">
                 <tr>
+                    <th>Session ID</th>
                     <th>Packet No.</th>
                     <th>Frame No.</th>
                     <th>PID (Hex)</th>
@@ -26,6 +27,7 @@
             <table class="table" id="vertical_scroll_table">
                 <thead id="frame_table_sticky_header" class="hide">
                     <tr>
+                        <th>Session ID</th>
                         <th>Packet No.</th>
                         <th>Frame No.</th>
                         <th>PID (Hex)</th>
@@ -43,12 +45,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *cdkVirtualFor="let element of linFramesObservableList | async" class="item">
+                    <tr *cdkVirtualFor="let element of linFramesObservableList$ | async" class="item">
+                        <td>{{element.SessionID}}</td>
                         <td>{{element.PCKNO}}</td>
                         <td>{{element.FNO}}</td>
                         <td>{{element.PID_HEX}}</td>
                         <td>{{element.PID_DEC}}</td>
-                        <td> - </td>
+                        <td>{{element.PID_Name}}</td>
                         <td>{{element.FDATA0}}</td>
                         <td> - </td>
                         <td>{{element.FDATA1}}</td>
@@ -75,91 +78,4 @@
             </div>
         </div>
     </div>
-
-
-
-    <!--<div class="device_tab_container">
-        <div class="frame_table_container">
-            <div *ngIf="devicesComponentState.deviceConnected; then showTable else showInfo"></div>
-            <ng-template #showTable>
-
-                <table class="table">
-                    <thead id="frame_table_header">
-                        <tr>
-                            <th>Packet No.</th>
-                            <th>Frame No.</th>
-                            <th>PID (Hex)</th>
-                            <th>PID (Dec)</th>
-                            <th>PID Name</th>
-                            <th>Payload[0]</th>
-                            <th>Payload[0] Name</th>
-                            <th>Payload[1]</th>
-                            <th>Payload[2]</th>
-                            <th>Payload[3]</th>
-                            <th>Payload[4]</th>
-                            <th>Payload[5]</th>
-                            <th>Payload[6]</th>
-                            <th>Payload[7]</th>
-                        </tr>
-                    </thead>
-                </table>
-
-                <cdk-virtual-scroll-viewport [itemSize]="20" id="tableContainer">
-                    <table class="table" id="vertical_scroll_table">
-                        <thead id="frame_table_header_hide">
-                            <tr>
-                                <th>Packet No.</th>
-                                <th>Frame No.</th>
-                                <th>PID (Hex)</th>
-                                <th>PID (Dec)</th>
-                                <th>PID Name</th>
-                                <th>Payload[0]</th>
-                                <th>Payload[0] Name</th>
-                                <th>Payload[1]</th>
-                                <th>Payload[2]</th>
-                                <th>Payload[3]</th>
-                                <th>Payload[4]</th>
-                                <th>Payload[5]</th>
-                                <th>Payload[6]</th>
-                                <th>Payload[7]</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *cdkVirtualFor="let element of linFramesObservableList | async" class="item">
-                                <td>{{element.PCKNO}}</td>
-                                <td>{{element.FNO}}</td>
-                                <td>{{element.PID_HEX}}</td>
-                                <td>{{element.PID_DEC}}</td>
-                                <td> - </td>
-                                <td>{{element.FDATA0}}</td>
-                                <td> - </td>
-                                <td>{{element.FDATA1}}</td>
-                                <td>{{element.FDATA2}}</td>
-                                <td>{{element.FDATA3}}</td>
-                                <td>{{element.FDATA4}}</td>
-                                <td>{{element.FDATA5}}</td>
-                                <td>{{element.FDATA6}}</td>
-                                <td>{{element.FDATA7}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </cdk-virtual-scroll-viewport>
-
-            </ng-template>
-        </div>
-        <ng-template #showInfo>Please connect to the device to start monitoring frames</ng-template>
-        <div class="frame_table_controls_container">
-            <div class="device_control_wrapper">
-                <ng-select id="device_select_dropdown" [(ngModel)]="selectedDevice" bindValue="name" [dropdownPosition]="'top'" placeholder="Please select a device">
-                    <ng-option *ngFor="let device of devices" [value]="device.name">{{device.name}}</ng-option>
-                </ng-select>
-                <div *ngIf="!devicesComponentState.deviceConnected">
-                    <button type="button" class="btn btn-primary ml-1" (click)="addUserToSignalRGroup()">Connect</button>
-                </div>
-
-                <button type="button" class="btn btn-primary ml-1" (click)="removeUserFromSignalRGroup()">Disconnect</button>
-            </div>
-            <div class="filtering_control_wrapper"></div>
-        </div>
-    </div>-->
 </div>

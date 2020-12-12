@@ -1,9 +1,11 @@
 export class LinFrame
 {
+    SessionID: string;
     PCKNO: number;
     FNO : number;
     PID_HEX: string;
     PID_DEC: number;
+    PID_Name?: string;
     FDATA0: string;
     FDATA1: string;
     FDATA2: string;

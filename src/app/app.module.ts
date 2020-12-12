@@ -4,7 +4,6 @@ import { SidebarModule } from './modules/sidebar/sidebar.module';
 import { ToggleSidebarModule } from './modules/toggle-sidebar/toggle-sidebar.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { DevicesModule } from './modules/devices/devices.module';
-import { HeaderModule } from './modules/header/header.module';
 import { SettingsListModule } from './modules/settings/settings-list/settings-list.module';
 import { SettingsEditModule } from './modules/settings/settings-edit/settings-edit.module';
 import { SignalRService } from './services/signalR/signal-r.service';
@@ -35,7 +34,6 @@ import { IPublicClientApplication, PublicClientApplication, InteractionType, Bro
 import { MsalGuard, MsalInterceptor, MsalBroadcastService, MsalInterceptorConfiguration, MsalModule, MsalService, MSAL_GUARD_CONFIG, MSAL_INSTANCE, MSAL_INTERCEPTOR_CONFIG, MsalGuardConfiguration } from '@azure/msal-angular';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MsalTokenInterceptorService } from './services/msal-token-interceptor/msal-token-interceptor.service';
 
 const isIE = window.navigator.userAgent.indexOf("MSIE ") > -1 || window.navigator.userAgent.indexOf("Trident/") > -1;
 
@@ -82,7 +80,6 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
     MatSidenavModule,
     DashboardModule,
     SidebarModule,
-    HeaderModule,
     SettingsListModule,
     SettingsEditModule,
     DevicesModule,
@@ -112,11 +109,6 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
       useClass: MsalInterceptor,
       multi: true
     },
-    /*{
-      provide: HTTP_INTERCEPTORS,
-      useClass: MsalTokenInterceptorService,
-      multi: true
-    },*/
     {
       provide: MSAL_INSTANCE,
       useFactory: MSALInstanceFactory

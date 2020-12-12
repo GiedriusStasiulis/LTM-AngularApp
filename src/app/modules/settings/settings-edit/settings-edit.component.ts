@@ -51,10 +51,10 @@ export class SettingsEditComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
-    /*if(this.userId == null)
+    if(this.userId == null)
     {
-      this.userId = this._authService.getAccount().accountIdentifier;
-    }*/
+      this.userId = this.getLoggedInAccountID();
+    }
 
     this.tranMode = "new";    
     this.userSettingsItemForm = this._fb.group({    
@@ -161,4 +161,12 @@ export class SettingsEditComponent implements OnInit, OnDestroy {
     this.userSettingsItemForm.reset();    
     this._router.navigate(['/settings']);    
   }  
+
+  getLoggedInAccountID()
+  {
+    const localAccount = sessionStorage.getItem("signedInAccount");
+    var accInfo = JSON.parse(localAccount);
+
+    return accInfo.localAccountId;
+  }
 }
