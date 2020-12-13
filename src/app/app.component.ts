@@ -154,6 +154,7 @@ export class AppComponent implements OnInit
   //#endregion
 
   ngOnDestroy(): void {
+    
     this.signalRMessagesSub.unsubscribe();
     this._destroying$.next(null);
     this._destroying$.complete();

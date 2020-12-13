@@ -103,7 +103,7 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
     MatCardModule,
     ScrollingModule,
     TableVirtualScrollModule,
-    MatCheckboxModule
+    MatCheckboxModule,
   ],
   providers: [
     {

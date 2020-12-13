@@ -32,6 +32,7 @@ cdk-virtual-scroll-viewport {
 #tableContainer {
     display: flex;
     flex-flow: column;
+    border-bottom: 2px royalblue;
 }
 
 #user_input_container {
@@ -121,8 +122,8 @@ cdk-virtual-scroll-viewport {
 
 #status_text {
     color: white;
-    font-size: 15px;
-    padding: 9px;
+    font-size: 11px;
+    padding: 10px;
 }
 
 #autoScrollTrigger {

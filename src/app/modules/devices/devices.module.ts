@@ -9,7 +9,7 @@ import { ComponentStateService } from '../../services/component-state-service/co
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 
@@ -25,7 +25,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     NgSelectModule,
     FormsModule,
     ScrollingModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    ReactiveFormsModule
   ],
   exports: [],
   providers: [

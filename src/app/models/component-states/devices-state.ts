@@ -2,8 +2,10 @@ import { ComponentState } from './component-state';
 
 export class DevicesComponentState extends ComponentState
 {
-    deviceId: string;
+    selectedDeviceId: string;
+    deviceStatusText: string;
     deviceConnected: boolean;
-    sessionIds: string[];
     alwaysScrollToBottom: boolean;
+    selectedAdditionalColumns: any[];
+    selectedFilterColumn: any;    
 }
