@@ -13,6 +13,7 @@ import { SettingsDataService } from 'src/app/services/settings-data/settings-dat
 import { ThemePalette } from '@angular/material/core';
 import { MatCheckbox, MatCheckboxChange } from '@angular/material/checkbox';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import * as _ from 'lodash';
 
 let $ = require('../../../../node_modules/jquery/dist/jquery.min.js');
 
@@ -78,13 +79,18 @@ export class DevicesComponent implements OnInit {
   userSettingsSub = new SubSink();
   linframesDataServiceSub = new SubSink();
   selectedAdditionalColumnsSub = new SubSink();
+  filterTextSub = new SubSink();
 
   linFramesObservableList: LinFrame[] = [];
   linFramesObservableList$ = new BehaviorSubject<LinFrame[]>([]);
+  linFramesObservableListFiltered$ = new BehaviorSubject<LinFrame[]>([]);
 
   userSettingsItems: UserSettingsItem[] = [];  
   connectionButtonDisabled: boolean = true;
   selectDeviceIdInputDisabled: boolean = false;
+
+  filterEnabled: boolean = false
+  filterText: string = "";
 
   constructor(private _signalRService: SignalRService, 
               private _componentStateService: ComponentStateService, 
@@ -118,6 +124,8 @@ export class DevicesComponent implements OnInit {
 
     this.linframesDataServiceSub.sink = this._linframesDataService.linFramesList$.subscribe(async frames => {
       
+      this.linFramesObservableList = frames;
+      console.log("LinFrames length: " + this.linFramesObservableList.length)
       var framesToLoad: LinFrame[] = frames;
 
       if(this.devicesComponentState.deviceConnected)
@@ -140,6 +148,8 @@ export class DevicesComponent implements OnInit {
 
   async loadDataToTable(_linFrames: LinFrame[], option: number)
   {
+    console.log("Frames to be added: " + _linFrames.length);
+
     this.userSettingsItems.forEach(element => {
       let itemIndex = _linFrames.findIndex(r => r.PID_HEX === element.pidHexValue);
 
@@ -150,6 +160,21 @@ export class DevicesComponent implements OnInit {
         _linFrames[itemIndex] = _linFrames[itemIndex];
       }
     });
+
+    //Ideally here
+    if(this.filterEnabled)
+    {
+      _linFrames = _linFrames.filter(item =>
+        Object.keys(item).some(
+          k =>
+            item[k] != null &&
+            item[k]
+              .toString()
+              .toLowerCase()
+              .includes(this.filterText.toLowerCase())
+        )
+      );
+    }
 
     switch(option)
     {
@@ -240,11 +265,6 @@ export class DevicesComponent implements OnInit {
     var deviceIdNull = this.devicesComponentState.selectedDeviceId ? false : true;
     this.connectionButtonDisabled = deviceIdNull ? true : false;
 
-    if(this.connectionButtonDisabled)
-    {
-      document.getElementById("device_select_dropdown").classList.add(".ng-select .ng-select-container:hover{background-color: yellow;}");
-    }
-
     this.selectedDeviceId$.next(this.devicesComponentState.selectedDeviceId);
     this.saveComponentState(this.devicesComponentState);
   }
@@ -261,11 +281,26 @@ export class DevicesComponent implements OnInit {
     this.saveComponentState(this.devicesComponentState);
   }
 
-  onKeyUp(event) 
+  onKeyUp(event: { target: { value: string; }; }) 
   {
-    //this.devicesComponentState.filterText = event.target.value
-    //this.filterText$.next(this.devicesComponentState.filterText);
-    //this.saveComponentState(this.devicesComponentState);
+    this.filterText = event.target.value;
+    this.filterEnabled = event.target.value.length > 0 ? true : false;
+
+    this._linframesDataService.linFramesList$.subscribe(frames => {
+
+      this.linFramesObservableList = frames.filter(item =>
+        Object.keys(item).some(
+          k =>
+            item[k] != null &&
+            item[k]
+              .toString()
+              .toLowerCase()
+              .includes(this.filterText.toLowerCase())
+        )
+      );
+    });
+
+    this.linFramesObservableList$.next(this.linFramesObservableList);
   }
 
   toggleAutoscroll(event:MatCheckboxChange): void {
@@ -303,7 +338,7 @@ export class DevicesComponent implements OnInit {
     this.devicesComponentState = new DevicesComponentState();
 
     //Set default properties
-    this.devicesComponentState.selectedDeviceId = "";
+    this.devicesComponentState.selectedDeviceId = null;
     this.devicesComponentState.deviceConnected = false;    
     this.devicesComponentState.alwaysScrollToBottom = false;
     this.devicesComponentState.selectedAdditionalColumns = [];
