@@ -87,7 +87,7 @@ export class SignalRService {
   }
 
   private announceMessage(message: string): void {
-    console.log("Announcing message!");
+    //console.log("Announcing message!");
     this.message$.next(message);
   }
 

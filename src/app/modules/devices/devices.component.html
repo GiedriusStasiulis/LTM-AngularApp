@@ -1,4 +1,4 @@
-<div class="content_container">
+<div class="content_container" id="devices_content_container">
     <div id="frame_table_sticky_header_area">
         <table class="table">
             <thead id="frame_table_sticky_header">
@@ -7,10 +7,10 @@
                     <th>Packet No.</th>
                     <th>Frame No.</th>
                     <th>PID (Hex)</th>
-                    <th>PID (Dec)</th>
-                    <th>PID Name</th>
+                    <th [ngClass]="{'hidden_table_element': !pidDecColumnToggle}">PID (Dec)</th>
+                    <th [ngClass]="{'hidden_table_element': !pidNameColumnToggle}">PID Name</th>
                     <th>Payload[0]</th>
-                    <th>Payload[0] Name</th>
+                    <th [ngClass]="{'hidden_table_element': !p0NameColumnToggle}">Payload[0] Name</th>
                     <th>Payload[1]</th>
                     <th>Payload[2]</th>
                     <th>Payload[3]</th>
@@ -31,10 +31,10 @@
                         <th>Packet No.</th>
                         <th>Frame No.</th>
                         <th>PID (Hex)</th>
-                        <th>PID (Dec)</th>
-                        <th>PID Name</th>
+                        <th [ngClass]="{'hidden_table_element': !pidDecColumnToggle}">PID (Dec)</th>
+                        <th [ngClass]="{'hidden_table_element': !pidNameColumnToggle}">PID Name</th>
                         <th>Payload[0]</th>
-                        <th>Payload[0] Name</th>
+                        <th [ngClass]="{'hidden_table_element': !p0NameColumnToggle}">Payload[0] Name</th>
                         <th>Payload[1]</th>
                         <th>Payload[2]</th>
                         <th>Payload[3]</th>
@@ -44,16 +44,16 @@
                         <th>Payload[7]</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr *cdkVirtualFor="let element of linFramesObservableList$ | async" class="item">
+                <tbody id="tableBodyHeight">
+                    <tr *cdkVirtualFor="let element of linFramesObservableList$ | async" class="item" id="tableRowTrigger">
                         <td>{{element.SessionID}}</td>
                         <td>{{element.PCKNO}}</td>
                         <td>{{element.FNO}}</td>
                         <td>{{element.PID_HEX}}</td>
-                        <td>{{element.PID_DEC}}</td>
-                        <td>{{element.PID_Name}}</td>
+                        <td [ngClass]="{'hidden_table_element': !pidDecColumnToggle}">{{element.PID_DEC}}</td>
+                        <td [ngClass]="{'hidden_table_element': !pidNameColumnToggle}">{{element.PID_Name}}</td>
                         <td>{{element.FDATA0}}</td>
-                        <td> - </td>
+                        <td [ngClass]="{'hidden_table_element': !p0NameColumnToggle}"> - </td>
                         <td>{{element.FDATA1}}</td>
                         <td>{{element.FDATA2}}</td>
                         <td>{{element.FDATA3}}</td>
@@ -62,19 +62,65 @@
                         <td>{{element.FDATA6}}</td>
                         <td>{{element.FDATA7}}</td>
                     </tr>
+                    <div id="scrollTarget" style="height: 10px;"></div>
                 </tbody>
             </table>
         </cdk-virtual-scroll-viewport>
-        <div id="device_controls_container">
-            <div class="device_control_wrapper">
-                <ng-select id="device_select_dropdown" [(ngModel)]="selectedDevice" bindValue="name" [dropdownPosition]="'top'" placeholder="Please select a device">
-                    <ng-option *ngFor="let device of devices" [value]="device.name">{{device.name}}</ng-option>
-                </ng-select>
-                <div *ngIf="!devicesComponentState.deviceConnected">
-                    <button type="button" class="btn btn-primary ml-1" (click)="addUserToSignalRGroup()">Connect</button>
-                </div>
 
-                <button type="button" class="btn btn-primary ml-1" (click)="removeUserFromSignalRGroup()">Disconnect</button>
+        <div id="user_input_container">
+            <div id="autoScrollTrigger"></div>
+            <div class="user_input_wrapper" id="device_control_wrapper">
+                <div class="user_input_controls_label">Select device:</div>
+                <div class="input_row">
+                    <ng-select id="device_select_dropdown" [(ngModel)]="selectedDevice" bindValue="name" [dropdownPosition]="'top'" placeholder="No device selected">
+                        <ng-option *ngFor="let device of devices" [value]="device.name">{{device.name}}</ng-option>
+                    </ng-select>
+                </div>
+                <div class="user_input_controls_label">Device action:</div>
+                <div class="input_row">
+                    <div id="device_btn_area">
+                        <div *ngIf="!devicesComponentState.deviceConnected; else showDisconnectBtn">
+                            <button type="button" class="btn btn-success ml-1" (click)="addUserToSignalRGroup()">Connect</button>
+                        </div>
+                        <ng-template #showDisconnectBtn>
+                            <button type="button" class="btn btn-danger ml-1" (click)="removeUserFromSignalRGroup()">Disconnect</button>
+                        </ng-template>
+                    </div>
+                    <div id="device_status_area">
+                        <div id="status_text">Status: ---</div>
+                    </div>
+                </div>
+            </div>
+            <div class="vertical_divider"></div>
+            <div class="user_input_wrapper" id="table_control_wrapper">
+                <div class="user_input_controls_label">Table actions:</div>
+                <div class="input_row">
+                    <mat-checkbox id="autoScrollCheckbox" [color]="checkBoxColor" (change)="toggleAutoscroll($event)">Auto scroll-down</mat-checkbox>
+                    <button id="clear_table_btn" type="button" class="btn btn-primary ml-3" (click)="clearTable()">Clear table</button>
+                </div>
+                <div class="user_input_controls_label">Display additional columns:</div>
+                <div class="input_row">
+                    <ng-select id="additionalColumnsSelect" [items]="additionalColumns" [multiple]="true" placeholder="Select additional columns" bindLabel="name" groupBy="type" [selectableGroup]="true" [selectableGroupAsModel]="false" [closeOnSelect]="true" bindValue="id"
+                        [(ngModel)]="selectedAdditionalColumns" (change)="getSelectedAdditionalColumns()">
+                        <ng-template ng-optgroup-tmp let-item="item" let-item$="item$" let-index="index">
+                            <input id="item-{{name}}" type="checkbox" [ngModel]="item$.selected" /> {{item.type | uppercase}}
+                        </ng-template>
+                        <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                            <input id="item-{{name}}" type="checkbox" [ngModel]="item$.selected" /> {{item.name}}
+                        </ng-template>
+                    </ng-select>
+                </div>
+            </div>
+            <div class="vertical_divider"></div>
+            <div class="user_input_wrapper" id="filter_table_wrapper">
+                <div class="user_input_controls_label">Filter table:</div>
+                <div class="input_row">
+                    <ng-select id="col_select_dropdown" [(ngModel)]="selectedColumn" bindValue="name" [dropdownPosition]="'top'" placeholder="Column filter (optional)">
+                        <ng-option *ngFor="let column of columns" [value]="column.name">{{column.name}}</ng-option>
+                    </ng-select>
+                    <input type="email" class="form-control" id="filterSearchInput" placeholder="Type filter keyword">
+                </div>
+                <div class="user_input_controls_label">Other actions:</div>
             </div>
         </div>
     </div>

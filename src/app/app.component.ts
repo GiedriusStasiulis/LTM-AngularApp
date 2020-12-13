@@ -10,8 +10,6 @@ import { SubSink } from 'subsink';
 import { SignalRService } from './services/signalR/signal-r.service';
 import { LinframesDataService } from './services/linframes-data/linframes-data.service';
 import { LinFrame } from './models/linFrame';
-import { SettingsDataService } from './services/settings-data/settings-data.service';
-import { UserSettingsItem } from './models/userSettingsItem';
 
 const isIE = window.navigator.userAgent.indexOf("MSIE ") > -1 || window.navigator.userAgent.indexOf("Trident/") > -1;
 
@@ -125,7 +123,8 @@ export class AppComponent implements OnInit
     
     for(let i = 0; i < Object.keys(message.FRAMES).length; i++)
     {      
-      const payloadArr = message.FRAMES[i].FDATA.split(/[ ]+/);
+      //const payloadArr = message.FRAMES[i].FDATA.split(/[ ]+/);
+      const payloadArr = message.FRAMES[i].FDATA.match(/..?/g)
 
       //var item = this.userSettingsItems.find(s => s.pidHexValue === payloadArr[0])
 

@@ -34,6 +34,7 @@ import { IPublicClientApplication, PublicClientApplication, InteractionType, Bro
 import { MsalGuard, MsalInterceptor, MsalBroadcastService, MsalInterceptorConfiguration, MsalModule, MsalService, MSAL_GUARD_CONFIG, MSAL_INSTANCE, MSAL_INTERCEPTOR_CONFIG, MsalGuardConfiguration } from '@azure/msal-angular';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 const isIE = window.navigator.userAgent.indexOf("MSIE ") > -1 || window.navigator.userAgent.indexOf("Trident/") > -1;
 
@@ -101,7 +102,8 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
     MatProgressSpinnerModule,
     MatCardModule,
     ScrollingModule,
-    TableVirtualScrollModule
+    TableVirtualScrollModule,
+    MatCheckboxModule
   ],
   providers: [
     {

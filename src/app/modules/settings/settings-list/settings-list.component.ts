@@ -17,7 +17,7 @@ import { SettingsDataService } from '../../../services/settings-data/settings-da
 
 export class SettingsListComponent implements OnInit{
 
-  pageTitle = 'User Settings';    
+  pageTitle = 'Signal namings';    
   filteredUserSettingsItems: UserSettingsItem[] = [];    
   userSettingsItems: UserSettingsItem[] = [];    
   errorMessage = '';

@@ -11,6 +11,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @NgModule({
   declarations: [DevicesComponent],
@@ -23,7 +24,8 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
     MatFormFieldModule,
     NgSelectModule,
     FormsModule,
-    ScrollingModule
+    ScrollingModule,
+    MatCheckboxModule
   ],
   exports: [],
   providers: [

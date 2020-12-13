@@ -7,9 +7,14 @@ import { ComponentStateService } from '../../services/component-state-service/co
 import { DevicesComponentState } from 'src/app/models/component-states/devices-state';
 import { ComponentStateType } from 'src/app/models/component-states/component-state-type-enum';
 import { LinframesDataService } from 'src/app/services/linframes-data/linframes-data.service';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { UserSettingsItem } from 'src/app/models/userSettingsItem';
 import { SettingsDataService } from 'src/app/services/settings-data/settings-data.service';
+import { ThemePalette } from '@angular/material/core';
+import { MatCheckboxChange } from '@angular/material/checkbox';
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+
+let $ = require('../../../../node_modules/jquery/dist/jquery.min.js');
 
 @Component({
   selector: 'app-devices',
@@ -20,9 +25,19 @@ export class DevicesComponent implements OnInit {
 
   //Table variables
   @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(CdkVirtualScrollViewport) virtualScroll: CdkVirtualScrollViewport;
 
   tableContainer: HTMLElement;
   table: HTMLElement;
+  tableHeaderPIDDecTop: HTMLElement;
+  tableHeaderPIDNameTop: HTMLElement;
+  tableHeaderP0NameTop: HTMLElement;
+  tableHeaderPIDDecBottom: HTMLElement;
+  tableHeaderPIDNameBottom: HTMLElement;
+  tableHeaderP0NameBottom: HTMLElement;
+  tableColumnPIDDecBottom: HTMLElement;
+  tableColumnPIDNameBottom: HTMLElement;
+  tableColumnP0NameBottom: HTMLElement;
 
   displayedColumns: string[] = ['sessionId','packetNo','frameNo', 'pidHex', 'pidDec', 'pidName', 'payload0', 'payload0Name', 'payload1', 'payload2', 'payload3', 'payload4', 'payload5', 'payload6', 'payload7'];
   columnsToDisplay: string[] = this.displayedColumns.slice();
@@ -50,6 +65,43 @@ export class DevicesComponent implements OnInit {
         { id: 2, name: 'ESP32DEV1' }
     ];
 
+  columns = [
+        { id: 1, name: 'Session ID'},
+        { id: 2, name: 'Packet No.'},
+        { id: 3, name: 'PID (Hex)'},
+        { id: 4, name: 'PID (Dec)'},
+        { id: 5, name: 'PID Name'},
+        { id: 6, name: 'Payload[0] Name'},
+        { id: 7, name: 'Payload[1] Name'},
+        { id: 8, name: 'Payload[2] Name'},
+        { id: 9, name: 'Payload[3] Name'},
+        { id: 10, name: 'Payload[4] Name'},
+        { id: 11, name: 'Payload[5] Name'},
+        { id: 12, name: 'Payload[6] Name'},
+        { id: 13, name: 'Payload[7] Name'},
+  ];
+
+  selectedColumn : any;
+
+  additionalColumns = [
+        { id: 1, name: 'PID (Dec)', type: 'Select All'},
+        { id: 2, name: 'PID Name', type: 'Select All'},
+        { id: 3, name: 'Payload[0] Name', type: 'Select All'},
+        { id: 4, name: 'Payload[1] Name', type: 'Select All'},
+        { id: 5, name: 'Payload[2] Name', type: 'Select All'},
+        { id: 6, name: 'Payload[3] Name', type: 'Select All'},
+        { id: 7, name: 'Payload[4] Name', type: 'Select All'},
+        { id: 8, name: 'Payload[5] Name', type: 'Select All'},
+        { id: 9, name: 'Payload[6] Name', type: 'Select All'},
+        { id: 10, name: 'Payload[7] Name', type: 'Select All'},
+  ];
+
+  selectedAdditionalColumns = [];
+  selectedAdditionalColumns$ = new BehaviorSubject<number[]>([]);
+  pidDecColumnToggle: boolean;
+  pidNameColumnToggle: boolean;
+  p0NameColumnToggle: boolean;
+
   linFramesObservableList: LinFrame[] = [];
   linFramesObservableList$ = new BehaviorSubject<LinFrame[]>([]);
 
@@ -57,6 +109,10 @@ export class DevicesComponent implements OnInit {
 
   selectedDevice = this.devices[0].name;
 
+  checkBoxColor: ThemePalette = 'primary';
+
+  newTableHeight: string;
+  
   constructor(private _signalRService: SignalRService, 
               private _componentStateService: ComponentStateService, 
               private _linframesDataService: LinframesDataService,
@@ -100,12 +156,27 @@ export class DevicesComponent implements OnInit {
         this.loadDataToTable(framesToLoad, 1);
       }
     }); 
+
+    this.selectedAdditionalColumns$.subscribe(selectedValues => {
+
+      var showPIDDecColumn = selectedValues.includes(1);
+      this.pidDecColumnToggle = showPIDDecColumn ? true : false;
+
+      var showPIDNameColumn = selectedValues.includes(2);
+      this.pidNameColumnToggle = showPIDNameColumn ? true : false;
+
+      var showP0NameColumn = selectedValues.includes(3);
+      this.p0NameColumnToggle = showP0NameColumn ? true : false;
+    });
   }
 
   async loadDataToTable(_linFrames: LinFrame[], option: number)
   {
     this.tableContainer = document.getElementById("tableContainer");
     this.table = document.getElementById("vertical_scroll_table");
+
+    var lastTableRowOffsetTop = $('#vertical_scroll_table tr:last').offset().top;
+    var autoScrollTriggerOffsetTop  = $("#autoScrollTrigger").offset().top;
 
     this.userSettingsItems.forEach(element => {
       let itemIndex = _linFrames.findIndex(r => r.PID_HEX === element.pidHexValue);
@@ -119,28 +190,23 @@ export class DevicesComponent implements OnInit {
 
     switch(option)
     {
-      //Iterate with small delay
+      //Add in chunks
       case 0:
 
         var observableListLenght = this.linFramesObservableList$.getValue().length;
         var framesToAddLength = _linFrames.length;
 
+        console.log("Row count: " + framesToAddLength);
+
         for(let i = observableListLenght; i < framesToAddLength; i++){
 
           const NEW_FRAMES = this.linFramesObservableList$.value.concat(_linFrames[i]);
-          this.linFramesObservableList$.next(NEW_FRAMES)
-
-          if(this.devicesComponentState.alwaysScrollToBottom && this.table.scrollHeight > this.tableContainer.clientHeight)
-          {
-            this.tableContainer.scrollTop = this.tableContainer.scrollHeight;
-          } 
-
-          await this.delay(5);
+          this.linFramesObservableList$.next(NEW_FRAMES)          
         }
 
-        if(this.devicesComponentState.alwaysScrollToBottom && this.table.scrollHeight > this.tableContainer.clientHeight)
+        if(this.devicesComponentState.alwaysScrollToBottom)
         {
-          this.tableContainer.scrollTop = this.tableContainer.scrollHeight;
+            this.ScrollBottom();
         } 
 
         break;
@@ -150,16 +216,20 @@ export class DevicesComponent implements OnInit {
 
         this.linFramesObservableList$.next(_linFrames);
 
+        if(this.devicesComponentState.alwaysScrollToBottom)
+        {
+            this.ScrollBottom();
+        } 
+
         break;
     }
   }
 
   ngOnDestroy() {
 
-    //this.removeUserFromSignalRGroup();
+    this.removeUserFromSignalRGroup();
     this.devicesComponentState.deviceConnected = false;
-    this.saveComponentState(this.devicesComponentState);
-    
+    this.saveComponentState(this.devicesComponentState);    
   }
 
   //SignalR Service functions
@@ -193,6 +263,20 @@ export class DevicesComponent implements OnInit {
 
   //Table functions
  
+  clearTable()
+  {
+    this.linFramesObservableList = [];
+    this.linFramesObservableList$.next(this.linFramesObservableList);
+  }
+
+  getSelectedAdditionalColumns()
+  {
+    this.selectedAdditionalColumns$.next(this.selectedAdditionalColumns);
+  }
+
+  toggleAutoscroll(event:MatCheckboxChange): void {
+    this.devicesComponentState.alwaysScrollToBottom = event.checked;
+  }
 
   onRowClicked(_row: boolean) 
   {
@@ -211,6 +295,21 @@ export class DevicesComponent implements OnInit {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }*/
  
+  ScrollBottom()
+  {
+    setTimeout(() => {
+      this.virtualScroll.scrollTo({
+        bottom: 0,
+        behavior: 'auto',
+      });
+    }, 50);
+    setTimeout(() => {
+      this.virtualScroll.scrollTo({
+        bottom: 0,
+        behavior: 'auto',
+      });
+    }, 100);
+  }
 
   //Component state functions
   initComponentState()
@@ -221,7 +320,7 @@ export class DevicesComponent implements OnInit {
     this.devicesComponentState.deviceConnected = false;
     this.devicesComponentState.deviceId = "ESP32SIM1";
     this.devicesComponentState.sessionIds = [];
-    this.devicesComponentState.alwaysScrollToBottom = true;
+    this.devicesComponentState.alwaysScrollToBottom = false;
   }
 
   saveComponentState(_deviceComponentState: DevicesComponentState)
@@ -242,6 +341,8 @@ export class DevicesComponent implements OnInit {
     return accInfo.localAccountId;
   }
 
+
+  
   //MISQ
   getCurrentDateTime(): string
   {
