@@ -7,6 +7,7 @@
 }
 
 #fixedHeaderRow {
+    padding-right: 20px;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -22,8 +23,8 @@
 
 .headerRowItem {
     float: left;
-    /*min-width: calc(100% / 12);
-    max-width: calc(100% / 12);*/
+    min-width: calc(100% / 12);
+    max-width: calc(100% / 12);
     font-size: 12px;
     text-align: center;
     white-space: nowrap;
@@ -32,7 +33,6 @@
 }
 
 #virtualScrollTableArea {
-    margin-top: -30px;
     flex: 1;
     height: 50px;
 }
@@ -40,6 +40,7 @@
 cdk-virtual-scroll-viewport {
     height: 100%;
     width: 100%;
+    overflow-y: scroll;
 }
 
 .scrollListItemRow {
@@ -50,8 +51,8 @@ cdk-virtual-scroll-viewport {
 
 .scrollListItem {
     float: left;
-    /*min-width: calc(100% / 22);
-    max-width: calc(100% / 22);*/
+    min-width: calc(100% / 12);
+    max-width: calc(100% / 12);
     font-size: 12px;
     text-align: center;
     white-space: nowrap;

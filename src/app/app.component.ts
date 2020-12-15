@@ -1,10 +1,10 @@
-import { AfterViewInit, Component, HostListener, Inject, OnInit } from '@angular/core';
-import { SidebarService } from 'src/app/services/sidebar.service';
+import { Component, HostListener, Inject, OnInit } from '@angular/core';
+import { SidebarService } from 'src/app/services/component-state-service/sidebar.service';
 import { mainContentAnimation } from './animations';
 import { MsalService, MsalBroadcastService, MSAL_GUARD_CONFIG, MsalGuardConfiguration } from '@azure/msal-angular';
 import { Subject } from 'rxjs';
 import { AccountInfo, BrowserCacheLocation, EventMessage, EventType, InteractionType } from '@azure/msal-browser';
-import { concatMap, exhaustMap, filter, map, mergeMap, switchMap, take, takeUntil } from 'rxjs/operators';
+import { concatMap, filter, takeUntil } from 'rxjs/operators';
 import * as msal from "@azure/msal-browser";
 import { SubSink } from 'subsink';
 import { SignalRService } from './services/signalR/signal-r.service';
@@ -13,8 +13,6 @@ import { LinFrame } from './models/linFrame';
 import { ComponentStateService } from './services/component-state-service/component-state.service';
 import { ComponentStateType } from './models/component-states/component-state-type-enum';
 import { DevicesComponentState } from './models/component-states/devices-state';
-import { DevicesComponent } from './modules/devices/devices.component';
-import { ComponentState } from './models/component-states/component-state';
 
 const isIE = window.navigator.userAgent.indexOf("MSIE ") > -1 || window.navigator.userAgent.indexOf("Trident/") > -1;
 
@@ -51,9 +49,6 @@ export class AppComponent implements OnInit
   isIframe = false;
   loggedIn = false;
   private readonly _destroyed$ = new Subject<void>();
-
-  signalRHubSub = new SubSink();
-  signalRMessagesSub = new SubSink();
   
   constructor(@Inject(MSAL_GUARD_CONFIG) private _msalGuardConfig: MsalGuardConfiguration, 
               private _sidebarService: SidebarService, 
@@ -152,25 +147,16 @@ export class AppComponent implements OnInit
         SessionID: ssid[1],
         PCKNO: message.PCKNO,
         FNO: message.FRAMES[i].FNO,
-        PID_HEX: payloadArr[0],
-        PID_DEC: parseInt(payloadArr[0], 16),
-        PID_Name: "-",
+        PID: payloadArr[0],
+        //PID_DEC: parseInt(payloadArr[0], 16),
         FDATA0: payloadArr[1],
-        FDATA0_Name: "-",
         FDATA1: payloadArr[2],
-        FDATA1_Name: "-",
         FDATA2: payloadArr[3],
-        FDATA2_Name: "-",
         FDATA3: payloadArr[4],
-        FDATA3_Name: "-",
         FDATA4: payloadArr[5],
-        FDATA4_Name: "-",
         FDATA5: payloadArr[6],
-        FDATA5_Name: "-",
         FDATA6: payloadArr[7],
-        FDATA6_Name: "-",
-        FDATA7: payloadArr[8],
-        FDATA7_Name: "-",
+        FDATA7: payloadArr[8]
       };
 
       LIN_FRAMES.push(FRAME);
@@ -186,7 +172,7 @@ export class AppComponent implements OnInit
   
     if(this.devicesComponentState.deviceConnected)
     {      
-      (await this._signalRService.removeUserFromSignalRGroup()).subscribe(result => {
+      (await this._signalRService.removeUserFromSignalRGroup()).subscribe(() => {
         
         this.devicesComponentState.deviceConnected = false;
         this._componentStateService.saveComponentState(ComponentStateType.DevicesComponentState, this.devicesComponentState);

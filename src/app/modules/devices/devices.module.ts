@@ -12,6 +12,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { TableviewLogicService } from 'src/app/services/logic/tableview-logic/tableview-logic.service';
 
 @NgModule({
   declarations: [DevicesComponent],
@@ -31,7 +32,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
   exports: [],
   providers: [
     SignalRService,
-    ComponentStateService
+    ComponentStateService,
+    TableviewLogicService
   ]
 })
 export class DevicesModule { }

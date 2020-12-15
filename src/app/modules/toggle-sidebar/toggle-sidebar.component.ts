@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SidebarService } from 'src/app/services/sidebar.service';
+import { SidebarService } from 'src/app/services/component-state-service/sidebar.service';
 
 @Component({
   selector: 'app-toggle-sidebar',
