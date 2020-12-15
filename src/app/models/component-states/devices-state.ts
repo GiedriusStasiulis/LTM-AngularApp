@@ -7,5 +7,4 @@ export class DevicesComponentState extends ComponentState
     deviceConnected: boolean;
     alwaysScrollToBottom: boolean;
     selectedAdditionalColumns: any[];
-    selectedFilterColumn: any;    
 }

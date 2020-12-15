@@ -1,15 +1,20 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { AfterViewInit, Component, HostListener, Inject, OnInit } from '@angular/core';
 import { SidebarService } from 'src/app/services/sidebar.service';
 import { mainContentAnimation } from './animations';
 import { MsalService, MsalBroadcastService, MSAL_GUARD_CONFIG, MsalGuardConfiguration } from '@azure/msal-angular';
 import { Subject } from 'rxjs';
 import { AccountInfo, BrowserCacheLocation, EventMessage, EventType, InteractionType } from '@azure/msal-browser';
-import { filter, takeUntil } from 'rxjs/operators';
+import { concatMap, exhaustMap, filter, map, mergeMap, switchMap, take, takeUntil } from 'rxjs/operators';
 import * as msal from "@azure/msal-browser";
 import { SubSink } from 'subsink';
 import { SignalRService } from './services/signalR/signal-r.service';
 import { LinframesDataService } from './services/linframes-data/linframes-data.service';
 import { LinFrame } from './models/linFrame';
+import { ComponentStateService } from './services/component-state-service/component-state.service';
+import { ComponentStateType } from './models/component-states/component-state-type-enum';
+import { DevicesComponentState } from './models/component-states/devices-state';
+import { DevicesComponent } from './modules/devices/devices.component';
+import { ComponentState } from './models/component-states/component-state';
 
 const isIE = window.navigator.userAgent.indexOf("MSIE ") > -1 || window.navigator.userAgent.indexOf("Trident/") > -1;
 
@@ -39,11 +44,15 @@ const myMSALObj = new msal.PublicClientApplication(msalConfig);
 })
 export class AppComponent implements OnInit
 {
+  devicesComponentState: DevicesComponentState;
+  deviceConnected: boolean;
+
   sidebarState: string;
   isIframe = false;
   loggedIn = false;
-  private readonly _destroying$ = new Subject<void>();
+  private readonly _destroyed$ = new Subject<void>();
 
+  signalRHubSub = new SubSink();
   signalRMessagesSub = new SubSink();
   
   constructor(@Inject(MSAL_GUARD_CONFIG) private _msalGuardConfig: MsalGuardConfiguration, 
@@ -51,39 +60,53 @@ export class AppComponent implements OnInit
               private _broadcastService: MsalBroadcastService, 
               private _authService: MsalService,
               private _signalRService: SignalRService,
-              private _linframesDataService: LinframesDataService)
+              private _linframesDataService: LinframesDataService,
+              private _componentStateService: ComponentStateService)
   { }
 
   ngOnInit() {
 
-    console.log("AppComponent on init!")
-
-    this._sidebarService.sidebarStateObservable$
-      .subscribe((newState: string) => {
-        this.sidebarState = newState;
-      });
-
     this.isIframe = window !== window.parent && !window.opener;
 
     this.checkAccount();
+
+    this._signalRService.connectToSignalRHub();   
   
     this._broadcastService.msalSubject$
       .pipe(
         filter((msg: EventMessage) => msg.eventType === EventType.LOGIN_SUCCESS || msg.eventType === EventType.ACQUIRE_TOKEN_SUCCESS),
-          takeUntil(this._destroying$)
+          takeUntil(this._destroyed$)
         )
       .subscribe(() => {
           this.checkAccount();
       });
 
-    this._signalRService.connectToSignalRHub();    
-
     //One sub to push frames to linframes-data.service
-    this.signalRMessagesSub.sink = this._signalRService.messageObservable$.subscribe(async message => {
-
-      var elementsToPush: LinFrame[] = this.parseLinFramePacket(JSON.parse(message));
-      this._linframesDataService.pushFramesToObservable(elementsToPush);
+    this._signalRService.messageObservable$
+      .pipe(
+        takeUntil(this._destroyed$)
+      )    
+      .subscribe(async message => {
+        var elementsToPush: LinFrame[] = this.parseLinFramePacket(JSON.parse(message));
+        this._linframesDataService.pushFramesToObservable(elementsToPush);
     });    
+
+    this._sidebarService.sidebarStateObservable$
+      .pipe(
+        takeUntil(this._destroyed$)
+      )
+      .subscribe((newState: string) => {
+        this.sidebarState = newState;
+    });
+
+    this._componentStateService.devicesComponentState$
+      .pipe(
+        concatMap(async (item) => item),
+        takeUntil(this._destroyed$)
+      )
+      .subscribe(result => {
+        this.devicesComponentState = result;
+      });     
   }
 
   //#region Methods - MSAL Authentication
@@ -123,10 +146,7 @@ export class AppComponent implements OnInit
     
     for(let i = 0; i < Object.keys(message.FRAMES).length; i++)
     {      
-      //const payloadArr = message.FRAMES[i].FDATA.split(/[ ]+/);
       const payloadArr = message.FRAMES[i].FDATA.match(/..?/g)
-
-      //var item = this.userSettingsItems.find(s => s.pidHexValue === payloadArr[0])
 
       const FRAME: LinFrame = {
         SessionID: ssid[1],
@@ -136,13 +156,21 @@ export class AppComponent implements OnInit
         PID_DEC: parseInt(payloadArr[0], 16),
         PID_Name: "-",
         FDATA0: payloadArr[1],
+        FDATA0_Name: "-",
         FDATA1: payloadArr[2],
+        FDATA1_Name: "-",
         FDATA2: payloadArr[3],
+        FDATA2_Name: "-",
         FDATA3: payloadArr[4],
+        FDATA3_Name: "-",
         FDATA4: payloadArr[5],
+        FDATA4_Name: "-",
         FDATA5: payloadArr[6],
+        FDATA5_Name: "-",
         FDATA6: payloadArr[7],
+        FDATA6_Name: "-",
         FDATA7: payloadArr[8],
+        FDATA7_Name: "-",
       };
 
       LIN_FRAMES.push(FRAME);
@@ -153,10 +181,25 @@ export class AppComponent implements OnInit
 
   //#endregion
 
-  ngOnDestroy(): void {
-    
-    this.signalRMessagesSub.unsubscribe();
-    this._destroying$.next(null);
-    this._destroying$.complete();
+  @HostListener('window:beforeunload',['$event'])
+  async ngOnDestroy(event: { preventDefault: () => void; returnValue: string; }) {
+  
+    if(this.devicesComponentState.deviceConnected)
+    {      
+      (await this._signalRService.removeUserFromSignalRGroup()).subscribe(result => {
+        
+        this.devicesComponentState.deviceConnected = false;
+        this._componentStateService.saveComponentState(ComponentStateType.DevicesComponentState, this.devicesComponentState);
+      });       
+
+      if(event)
+      {
+        event.preventDefault();
+        event.returnValue = 'A message.';
+      }
+    }
+
+    this._destroyed$.next(null);
+    this._destroyed$.complete();
   }
 }

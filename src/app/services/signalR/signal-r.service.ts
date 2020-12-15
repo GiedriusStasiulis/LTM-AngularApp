@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HubConnection } from '@aspnet/signalr';
-import { Subject, Observable } from 'rxjs';
+import { Subject, Observable, BehaviorSubject } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { SignalRConnectionInfo } from 'src/app/models/signal-r-connection-info';
 import * as signalR from '@aspnet/signalr';
@@ -21,6 +21,8 @@ export class SignalRService {
     this.messageObservable$ = this.message$.asObservable();  
   }
 
+  public selectedDeviceId$ = new BehaviorSubject<string>("");
+
   getSignalRConnectionInfo(): Observable<SignalRConnectionInfo>
   {
     let requestUrl: string = `${this.azureUrl}negotiate`;
@@ -32,6 +34,8 @@ export class SignalRService {
       this.getSignalRConnectionInfo().subscribe(results => {
 
         this.init(results);
+
+        //console.log(this.getSelectedDeviceId());
 
         console.log("SignalR Service started!")
       }, err => {
@@ -51,7 +55,7 @@ export class SignalRService {
     .configureLogging(signalR.LogLevel.Information)
     .build();
 
-    this.hubConnection.serverTimeoutInMilliseconds = 300000; //5 min
+    this.hubConnection.serverTimeoutInMilliseconds = 30000; //30 sec
 
     this.hubConnection.start()
       .catch(
@@ -60,13 +64,12 @@ export class SignalRService {
         }
       );
     
-    this.hubConnection.on('notify', (data: any) => {
+    this.hubConnection.on('notifyFrames', (data: any) => {
       this.announceMessage(data);
-      //console.log("SignalR connection state: " + this.hubConnection.state);
-      //console.log("SignalR connection ID: " + this.hubConnection.connectionId);
     });   
     
-    this.hubConnection.onclose((_error) => {
+    this.hubConnection.onclose(
+      (_error) => {
       if(this.hubConnection) {
         this.hubConnection.stop();
       }
@@ -76,18 +79,24 @@ export class SignalRService {
 
   addUserToSignalRGroup(_deviceId: string): Observable<object>
   {
+    this.selectedDeviceId$.next(_deviceId);
+
     let requestUrl: string = `${this.azureUrl}AddUserToSignalRGroup/${_deviceId}`;
     return this._httpClient.get(requestUrl);
   }
 
-  removeUserFromSignalRGroup(_deviceId: string): Observable<object>
+  async removeUserFromSignalRGroup(): Promise<Observable<object>>
   {
-    let requestUrl: string = `${this.azureUrl}RemoveUserFromSignalRGroup/${_deviceId}`;
+    let selectedId = this.selectedDeviceId$.value;
+
+    console.log("Removing user in service ...")
+    console.log(selectedId);
+
+    let requestUrl: string = `${this.azureUrl}RemoveUserFromSignalRGroup/${selectedId}`;
     return this._httpClient.get(requestUrl);
   }
 
   private announceMessage(message: string): void {
-    //console.log("Announcing message!");
     this.message$.next(message);
   }
 

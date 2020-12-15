@@ -45,6 +45,42 @@ export class SettingsEditComponent implements OnInit, OnDestroy {
         minlength: 'Payload[0] Name must be at least three characters.',    
         maxlength: 'Payload[0] Name cannot exceed 50 characters.'       
       },
+      payload1Name: {    
+        required: 'Payload[0] Name value is required.',    
+        minlength: 'Payload[0] Name must be at least three characters.',    
+        maxlength: 'Payload[0] Name cannot exceed 50 characters.'       
+      },
+      payload2Name: {    
+        required: 'Payload[0] Name value is required.',    
+        minlength: 'Payload[0] Name must be at least three characters.',    
+        maxlength: 'Payload[0] Name cannot exceed 50 characters.'       
+      },
+      payload3Name: {    
+        required: 'Payload[0] Name value is required.',    
+        minlength: 'Payload[0] Name must be at least three characters.',    
+        maxlength: 'Payload[0] Name cannot exceed 50 characters.'       
+      },
+      payload4Name: {    
+        required: 'Payload[0] Name value is required.',    
+        minlength: 'Payload[0] Name must be at least three characters.',    
+        maxlength: 'Payload[0] Name cannot exceed 50 characters.'       
+      },
+      payload5Name: {    
+        required: 'Payload[0] Name value is required.',    
+        minlength: 'Payload[0] Name must be at least three characters.',    
+        maxlength: 'Payload[0] Name cannot exceed 50 characters.'       
+      },
+      payload6Name: {    
+        required: 'Payload[0] Name value is required.',    
+        minlength: 'Payload[0] Name must be at least three characters.',    
+        maxlength: 'Payload[0] Name cannot exceed 50 characters.'       
+      },
+      
+      payload7Name: {    
+        required: 'Payload[0] Name value is required.',    
+        minlength: 'Payload[0] Name must be at least three characters.',    
+        maxlength: 'Payload[0] Name cannot exceed 50 characters.'       
+      },
     };    
     this.genericValidator = new GenericValidator(this.validationMessages);    
   }
@@ -66,10 +102,46 @@ export class SettingsEditComponent implements OnInit, OnDestroy {
         Validators.minLength(3),    
         Validators.maxLength(50)    
       ]], 
-      payload0Name: ['', [Validators.required,    
+      payload0Name: ['', 
+      [    
         Validators.minLength(3),    
         Validators.maxLength(50)    
-      ]],     
+      ]],   
+      payload1Name: ['', 
+      [    
+        Validators.minLength(3),    
+        Validators.maxLength(50)    
+      ]], 
+      payload2Name: ['', 
+      [    
+        Validators.minLength(3),    
+        Validators.maxLength(50)    
+      ]], 
+      payload3Name: ['', 
+      [   
+        Validators.minLength(3),    
+        Validators.maxLength(50)    
+      ]], 
+      payload4Name: ['', 
+      [    
+        Validators.minLength(3),    
+        Validators.maxLength(50)    
+      ]], 
+      payload5Name: ['', 
+      [  
+        Validators.minLength(3),    
+        Validators.maxLength(50)    
+      ]], 
+      payload6Name: ['', 
+      [    
+        Validators.minLength(3),    
+        Validators.maxLength(50)    
+      ]], 
+      payload7Name: ['', 
+      [    
+        Validators.minLength(3),    
+        Validators.maxLength(50)    
+      ]]
     });  
 
     if(this._router.url.toString() == "/settings/add")
@@ -78,7 +150,19 @@ export class SettingsEditComponent implements OnInit, OnDestroy {
 
       let _id = new Date().getTime().toString();
 
-      const USER_SETTINGS_ITEM: UserSettingsItem = { id: _id, userID: this.userId, pidHexValue: "", pidName: "", payload0Name: "" };
+      const USER_SETTINGS_ITEM: UserSettingsItem = { id: _id, 
+                                                     userID: this.userId, 
+                                                     pidHexValue: "", 
+                                                     pidName: "", 
+                                                     payload0Name: "",
+                                                     payload1Name: "",
+                                                     payload2Name: "",
+                                                     payload3Name: "",
+                                                     payload4Name: "",
+                                                     payload5Name: "",
+                                                     payload6Name: "",
+                                                     payload7Name: "",
+                                                    };
       this.displayUserSettingsItem(USER_SETTINGS_ITEM);
     }
     else
@@ -118,7 +202,14 @@ export class SettingsEditComponent implements OnInit, OnDestroy {
     this.userSettingsItemForm.patchValue({    
       pidHexValue: this.userSettingsItem.pidHexValue, 
       pidName: this.userSettingsItem.pidName, 
-      payload0Name: this.userSettingsItem.payload0Name
+      payload0Name: this.userSettingsItem.payload0Name,
+      payload1Name: this.userSettingsItem.payload1Name,
+      payload2Name: this.userSettingsItem.payload2Name,
+      payload3Name: this.userSettingsItem.payload3Name,
+      payload4Name: this.userSettingsItem.payload4Name,
+      payload5Name: this.userSettingsItem.payload5Name,
+      payload6Name: this.userSettingsItem.payload6Name,
+      payload7Name: this.userSettingsItem.payload7Name
     });        
   } 
 

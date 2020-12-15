@@ -1,102 +1,96 @@
 <div class="content_container" id="devices_content_container">
-    <div id="frame_table_sticky_header_area">
-        <table class="table">
-            <thead id="frame_table_sticky_header">
-                <tr>
-                    <th>Session ID</th>
-                    <th>Packet No.</th>
-                    <th>Frame No.</th>
-                    <th>PID (Hex)</th>
-                    <th [ngClass]="{'hidden_table_element': !pidDecColumnToggle}">PID (Dec)</th>
-                    <th [ngClass]="{'hidden_table_element': !pidNameColumnToggle}">PID Name</th>
-                    <th>Payload[0]</th>
-                    <th [ngClass]="{'hidden_table_element': !p0NameColumnToggle}">Payload[0] Name</th>
-                    <th>Payload[1]</th>
-                    <th>Payload[2]</th>
-                    <th>Payload[3]</th>
-                    <th>Payload[4]</th>
-                    <th>Payload[5]</th>
-                    <th>Payload[6]</th>
-                    <th>Payload[7]</th>
-                </tr>
-            </thead>
-        </table>
+    <div id="fixedHeaderRow">
+        <div class="headerRowItem" title="{{headers[0]['name']}}">{{headers[0]['name']}}</div>
+        <div class="headerRowItem" title="{{headers[1]['name']}}">{{headers[1]['name']}}</div>
+        <div class="headerRowItem" title="{{headers[2]['name']}}">{{headers[2]['name']}}</div>
+        <div class="headerRowItem" title="{{headers[3]['name']}}">{{headers[3]['name']}}</div>
+        <div class="headerRowItem" title="{{headers[4]['name']}}" [ngClass]="{'hidden_table_element': !pidDecColumnToggle}">{{headers[4]['name']}}</div>
+        <div class="headerRowItem" title="{{headers[5]['name']}}" [ngClass]="{'hidden_table_element': !pidNameColumnToggle}">{{headers[5]['name']}}</div>
+        <div class="headerRowItem" title="{{headers[6]['name']}}">{{headers[6]['name']}}</div>
+        <div class="headerRowItem" title="{{headers[7]['name']}}" [ngClass]="{'hidden_table_element': !p0NameColumnToggle}">{{headers[7]['name']}}</div>
+        <div class="headerRowItem" title="{{headers[8]['name']}}">{{headers[8]['name']}}</div>
+        <div class="headerRowItem" title="{{headers[9]['name']}}" [ngClass]="{'hidden_table_element': !p1NameColumnToggle}">{{headers[9]['name']}}</div>
+        <div class="headerRowItem" title="{{headers[10]['name']}}">{{headers[10]['name']}}</div>
+        <div class="headerRowItem" title="{{headers[11]['name']}}" [ngClass]="{'hidden_table_element': !p2NameColumnToggle}">{{headers[11]['name']}}</div>
+        <div class="headerRowItem" title="{{headers[12]['name']}}">{{headers[12]['name']}}</div>
+        <div class="headerRowItem" title="{{headers[13]['name']}}" [ngClass]="{'hidden_table_element': !p3NameColumnToggle}">{{headers[13]['name']}}</div>
+        <div class="headerRowItem" title="{{headers[14]['name']}}">{{headers[14]['name']}}</div>
+        <div class="headerRowItem" title="{{headers[15]['name']}}" [ngClass]="{'hidden_table_element': !p4NameColumnToggle}">{{headers[15]['name']}}</div>
+        <div class="headerRowItem" title="{{headers[16]['name']}}">{{headers[16]['name']}}</div>
+        <div class="headerRowItem" title="{{headers[17]['name']}}" [ngClass]="{'hidden_table_element': !p5NameColumnToggle}">{{headers[17]['name']}}</div>
+        <div class="headerRowItem" title="{{headers[18]['name']}}">{{headers[18]['name']}}</div>
+        <div class="headerRowItem" title="{{headers[19]['name']}}" [ngClass]="{'hidden_table_element': !p6NameColumnToggle}">{{headers[19]['name']}}</div>
+        <div class="headerRowItem" title="{{headers[20]['name']}}">{{headers[20]['name']}}</div>
+        <div class="headerRowItem" title="{{headers[21]['name']}}" [ngClass]="{'hidden_table_element': !p7NameColumnToggle}">{{headers[21]['name']}}</div>
     </div>
-    <div id="devices_component_container">
-        <cdk-virtual-scroll-viewport [itemSize]="20" id="tableContainer">
-            <table class="table" id="vertical_scroll_table">
-                <thead id="frame_table_sticky_header" class="hide">
-                    <tr>
-                        <th>Session ID</th>
-                        <th>Packet No.</th>
-                        <th>Frame No.</th>
-                        <th>PID (Hex)</th>
-                        <th [ngClass]="{'hidden_table_element': !pidDecColumnToggle}">PID (Dec)</th>
-                        <th [ngClass]="{'hidden_table_element': !pidNameColumnToggle}">PID Name</th>
-                        <th>Payload[0]</th>
-                        <th [ngClass]="{'hidden_table_element': !p0NameColumnToggle}">Payload[0] Name</th>
-                        <th>Payload[1]</th>
-                        <th>Payload[2]</th>
-                        <th>Payload[3]</th>
-                        <th>Payload[4]</th>
-                        <th>Payload[5]</th>
-                        <th>Payload[6]</th>
-                        <th>Payload[7]</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBodyHeight">
-                    <tr *cdkVirtualFor="let element of linFramesObservableList$ | async" class="item">
-                        <td>{{element.SessionID}}</td>
-                        <td>{{element.PCKNO}}</td>
-                        <td>{{element.FNO}}</td>
-                        <td>{{element.PID_HEX}}</td>
-                        <td [ngClass]="{'hidden_table_element': !pidDecColumnToggle}">{{element.PID_DEC}}</td>
-                        <td [ngClass]="{'hidden_table_element': !pidNameColumnToggle}">{{element.PID_Name}}</td>
-                        <td>{{element.FDATA0}}</td>
-                        <td [ngClass]="{'hidden_table_element': !p0NameColumnToggle}"> - </td>
-                        <td>{{element.FDATA1}}</td>
-                        <td>{{element.FDATA2}}</td>
-                        <td>{{element.FDATA3}}</td>
-                        <td>{{element.FDATA4}}</td>
-                        <td>{{element.FDATA5}}</td>
-                        <td>{{element.FDATA6}}</td>
-                        <td>{{element.FDATA7}}</td>
-                    </tr>
-                </tbody>
-            </table>
+    <div id="virtualScrollTableArea">
+        <cdk-virtual-scroll-viewport [itemSize]="20">
+            <div *cdkVirtualFor="let element of linFramesObservableList$ | async" class="scrollListItemRow">
+                <div class="scrollListItem" title="{{element.SessionID}}">{{element.SessionID}}</div>
+                <div class="scrollListItem" title="{{element.PCKNO}}">{{element.PCKNO}}</div>
+                <div class="scrollListItem" title="{{element.FNO}}">{{element.FNO}}</div>
+                <div class="scrollListItem" title="{{element.PID_HEX}}">{{element.PID_HEX}}</div>
+                <div class="scrollListItem" [ngClass]="{'hidden_table_element': !pidDecColumnToggle}" title="{{element.PID_DEC}}">{{element.PID_DEC}}</div>
+                <div class="scrollListItem" [ngClass]="{'hidden_table_element': !pidNameColumnToggle}" title="{{element.PID_Name}}">{{element.PID_Name}}</div>
+                <div class="scrollListItem" title="{{element.FDATA0}}">{{element.FDATA0}}</div>
+                <div class="scrollListItem" [ngClass]="{'hidden_table_element': !p0NameColumnToggle}" title="{{element.FDATA0_Name}}">{{element.FDATA0_Name}}</div>
+                <div class="scrollListItem" title="{{element.FDATA1}}">{{element.FDATA1}}</div>
+                <div class="scrollListItem" [ngClass]="{'hidden_table_element': !p1NameColumnToggle}" title="{{element.FDATA1_Name}}">{{element.FDATA1_Name}}</div>
+                <div class="scrollListItem" title="{{element.FDATA2}}">{{element.FDATA2}}</div>
+                <div class="scrollListItem" [ngClass]="{'hidden_table_element': !p2NameColumnToggle}" title="{{element.FDATA2_Name}}">{{element.FDATA2_Name}}</div>
+                <div class="scrollListItem" title="{{element.FDATA3}}">{{element.FDATA3}}</div>
+                <div class="scrollListItem" [ngClass]="{'hidden_table_element': !p3NameColumnToggle}" title="{{element.FDATA3_Name}}">{{element.FDATA3_Name}}</div>
+                <div class="scrollListItem" title="{{element.FDATA4}}">{{element.FDATA4}}</div>
+                <div class="scrollListItem" [ngClass]="{'hidden_table_element': !p4NameColumnToggle}" title="{{element.FDATA4_Name}}">{{element.FDATA4_Name}}</div>
+                <div class="scrollListItem" title="{{element.FDATA5}}">{{element.FDATA5}}</div>
+                <div class="scrollListItem" [ngClass]="{'hidden_table_element': !p5NameColumnToggle}" title="{{element.FDATA5_Name}}">{{element.FDATA5_Name}}</div>
+                <div class="scrollListItem" title="{{element.FDATA6}}">{{element.FDATA6}}</div>
+                <div class="scrollListItem" [ngClass]="{'hidden_table_element': !p6NameColumnToggle}" title="{{element.FDATA6_Name}}">{{element.FDATA6_Name}}</div>
+                <div class="scrollListItem" title="{{element.FDATA7}}">{{element.FDATA7}}</div>
+                <div class="scrollListItem" [ngClass]="{'hidden_table_element': !p7NameColumnToggle}" title="{{element.FDATA7_Name}}">{{element.FDATA7_Name}}</div>
+            </div>
         </cdk-virtual-scroll-viewport>
-
-        <div id="user_input_container">
-            <div class="user_input_wrapper" id="device_control_wrapper">
-                <div class="user_input_controls_label">Select device:</div>
-                <div class="input_row">
-                    <ng-select id="device_select_dropdown" [(ngModel)]="devicesComponentState.selectedDeviceId" bindValue="name" [dropdownPosition]="'top'" placeholder="No device selected" (change)="getSelectedDeviceId()" [disabled]="selectDeviceIdInputDisabled">
-                        <ng-option *ngFor="let device of devices" [value]="device.name">{{device.name}}</ng-option>
-                    </ng-select>
+    </div>
+    <div id="user_input_container">
+        <div class="user_input_wrapper" id="device_control_wrapper">
+            <div class="user_input_controls_label">Select device:</div>
+            <div class="input_row">
+                <ng-select id="device_select_dropdown" [(ngModel)]="devicesComponentState.selectedDeviceId" bindValue="name" [dropdownPosition]="'top'" placeholder="No device selected" (change)="getSelectedDeviceId()" [disabled]="selectDeviceIdInputDisabled">
+                    <ng-option *ngFor="let device of devices" [value]="device.name">{{device.name}}</ng-option>
+                </ng-select>
+            </div>
+            <div class="user_input_controls_label">Device action:</div>
+            <div class="input_row">
+                <div id="device_btn_area">
+                    <div *ngIf="!devicesComponentState.deviceConnected; else showDisconnectBtn">
+                        <button type="button" class="btn btn-success ml-1" (click)="addUserToSignalRGroup()" [disabled]="connectionButtonDisabled">Connect</button>
+                    </div>
+                    <ng-template #showDisconnectBtn>
+                        <button type="button" class="btn btn-danger ml-1" (click)="removeUserFromSignalRGroup()" [disabled]="connectionButtonDisabled">Disconnect</button>
+                    </ng-template>
                 </div>
-                <div class="user_input_controls_label">Device action:</div>
-                <div class="input_row">
-                    <div id="device_btn_area">
-                        <div *ngIf="!devicesComponentState.deviceConnected; else showDisconnectBtn">
-                            <button type="button" class="btn btn-success ml-1" (click)="addUserToSignalRGroup()" [disabled]="connectionButtonDisabled">Connect</button>
-                        </div>
-                        <ng-template #showDisconnectBtn>
-                            <button type="button" class="btn btn-danger ml-1" (click)="removeUserFromSignalRGroup()" [disabled]="connectionButtonDisabled">Disconnect</button>
-                        </ng-template>
-                    </div>
-                    <div id="device_status_area">
-                        <div id="status_text">Status: {{devicesComponentState.deviceStatusText}}</div>
-                    </div>
+                <div id="device_status_area">
+                    <div id="status_text">Status: {{devicesComponentState.deviceStatusText}}</div>
                 </div>
             </div>
-            <div class="vertical_divider"></div>
-            <div class="user_input_wrapper" id="table_control_wrapper">
-                <div class="user_input_controls_label">Table actions:</div>
-                <div class="input_row">
-                    <mat-checkbox id="autoScrollCheckbox" [(ngModel)]="devicesComponentState.alwaysScrollToBottom" [color]="checkBoxColor" (change)="toggleAutoscroll($event)">Auto scroll-down</mat-checkbox>
-                    <button id="clear_table_btn" type="button" class="btn btn-primary ml-3" (click)="clearTable()">Clear table</button>
-                </div>
-                <div class="user_input_controls_label">Display additional columns:</div>
+        </div>
+        <div class="vertical_divider"></div>
+        <div class="user_input_wrapper" id="table_control_wrapper">
+            <div class="user_input_controls_label">Table actions:</div>
+            <div class="input_row">
+                <mat-checkbox id="autoScrollCheckbox" [(ngModel)]="devicesComponentState.alwaysScrollToBottom" [color]="checkBoxColor" (change)="toggleAutoscroll($event)">Auto scroll-down</mat-checkbox>
+                <button id="clear_table_btn" type="button" class="btn btn-primary ml-3" (click)="clearTable()">Clear table</button>
+            </div>
+            <div class="user_input_controls_label">Filter table:</div>
+            <div class="input_row">
+                <input type="text" id="filterSearchInput" placeholder="Type filter keyword" (keyup)="onKeyUp($event)">
+            </div>
+            <div class="user_input_controls_label">Other actions:</div>
+        </div>
+        <div class="vertical_divider"></div>
+        <div class="user_input_wrapper" id="filter_table_wrapper">
+            <div class="user_input_controls_label">Display additional columns:</div>
+            <div class="input_row">
                 <div class="input_row">
                     <ng-select id="additionalColumnsSelect" [items]="additionalColumns" [multiple]="true" placeholder="Select additional columns" bindLabel="name" groupBy="type" [selectableGroup]="true" [selectableGroupAsModel]="false" [closeOnSelect]="true" bindValue="id"
                         [(ngModel)]="devicesComponentState.selectedAdditionalColumns" (change)="getSelectedAdditionalColumns()">
@@ -108,17 +102,6 @@
                         </ng-template>
                     </ng-select>
                 </div>
-            </div>
-            <div class="vertical_divider"></div>
-            <div class="user_input_wrapper" id="filter_table_wrapper">
-                <div class="user_input_controls_label">Filter table:</div>
-                <div class="input_row">
-                    <ng-select id="col_select_dropdown" [(ngModel)]="devicesComponentState.selectedFilterColumn" bindValue="name" [dropdownPosition]="'top'" placeholder="Column filter (optional)" (change)="getSelectedFilterColumn()">
-                        <ng-option *ngFor="let column of filterColumns" [value]="column.name">{{column.name}}</ng-option>
-                    </ng-select>
-                    <input type="text" class="form-control" id="filterSearchInput" placeholder="Type filter keyword" (keyup)="onKeyUp($event)">
-                </div>
-                <div class="user_input_controls_label">Other actions:</div>
             </div>
         </div>
     </div>

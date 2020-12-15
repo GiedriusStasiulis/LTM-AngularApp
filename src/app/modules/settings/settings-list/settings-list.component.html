@@ -1,13 +1,10 @@
 <div class="main_container">
     <div class="card">
-        <div class="card-header">
-            {{pageTitle}}
-        </div>
         <div class="card-body">
             <div class="row" style="margin-bottom:15px;">
                 <div class="col-md-3">
                     <a class="btn btn-primary mr-3" routerLink="/settings/add">
-                        <i class="fa fa-plus"></i> New naming
+                        <i class="fa fa-plus"></i> New signal name
                     </a>
                 </div>
             </div>
@@ -26,8 +23,13 @@
                                 <th>PID Hex value</th>
                                 <th>PID Name</th>
                                 <th>Payload[0] Name</th>
-                                <th></th>
-                                <th></th>
+                                <th>Payload[1] Name</th>
+                                <th>Payload[2] Name</th>
+                                <th>Payload[3] Name</th>
+                                <th>Payload[4] Name</th>
+                                <th>Payload[5] Name</th>
+                                <th>Payload[6] Name</th>
+                                <th>Payload[7] Name</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -36,6 +38,13 @@
                                 <td>{{ item.pidHexValue }}</td>
                                 <td>{{ item.pidName }}</td>
                                 <td>{{ item.payload0Name }}</td>
+                                <td>{{ item.payload1Name }}</td>
+                                <td>{{ item.payload2Name }}</td>
+                                <td>{{ item.payload3Name }}</td>
+                                <td>{{ item.payload4Name }}</td>
+                                <td>{{ item.payload5Name }}</td>
+                                <td>{{ item.payload6Name }}</td>
+                                <td>{{ item.payload7Name }}</td>
                                 <td>
                                     <button class="btn btn-outline-primary btn-sm" [routerLink]="['/settings/', item.id, 'edit']">  
                           <i class="fa fa-edit"></i> Edit  
