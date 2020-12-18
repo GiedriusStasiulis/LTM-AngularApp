@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HubConnection } from '@aspnet/signalr';
 import { Subject, Observable, BehaviorSubject } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { SignalRConnectionInfo } from 'src/app/models/signal-r-connection-info';
+import { SignalRConnectionInfo } from 'src/app/models/data/signal-r-connection-info';
 import * as signalR from '@aspnet/signalr';
 
 @Injectable({

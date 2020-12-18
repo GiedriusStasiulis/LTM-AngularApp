@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { ComponentState } from 'src/app/models/component-states/component-state';
 import { ComponentStateType } from 'src/app/models/component-states/component-state-type-enum';
-import { DevicesComponentState } from 'src/app/models/component-states/devices-state';
+import { MonitoringTableviewState } from 'src/app/models/component-states/monitoring-tableview-state';
 
 @Injectable()
 export class ComponentStateService {
 
   private componentState: ComponentState = new ComponentState();
-  public devicesComponentState$ = new BehaviorSubject<DevicesComponentState>(undefined);
+  public monitoringTableViewState$ = new BehaviorSubject<MonitoringTableviewState>(undefined);
 
   saveComponentState(_componentType: ComponentStateType, _componentState: ComponentState)
   {
@@ -16,9 +16,9 @@ export class ComponentStateService {
 
     switch(_componentType)
     {
-      case ComponentStateType.DevicesComponentState:
+      case ComponentStateType.MonitoringTableviewState:
 
-      this.devicesComponentState$.next(<DevicesComponentState>_componentState);
+      this.monitoringTableViewState$.next(<MonitoringTableviewState>_componentState);
         break;
     }
   }

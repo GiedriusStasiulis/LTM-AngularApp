@@ -1,0 +1,81 @@
+<div class="content_container" id="devices_content_container">
+    <div id="fixedHeaderRow">
+        <div class="headerRowItem" title="{{headers[0]['name']}}"><b>{{headers[0]['name']}}</b></div>
+        <div class="headerRowItem" title="{{headers[1]['name']}}"><b>{{headers[1]['name']}}</b></div>
+        <div class="headerRowItem" title="{{headers[2]['name']}}"><b>{{headers[2]['name']}}</b></div>
+        <div class="headerRowItem" title="{{headers[3]['name']}}"><b>{{headers[3]['name']}}</b></div>
+        <div class="headerRowItem" title="{{headers[4]['name']}}"><b>{{headers[4]['name']}}</b></div>
+        <div class="headerRowItem" title="{{headers[5]['name']}}"><b>{{headers[5]['name']}}</b></div>
+        <div class="headerRowItem" title="{{headers[6]['name']}}"><b>{{headers[6]['name']}}</b></div>
+        <div class="headerRowItem" title="{{headers[7]['name']}}"><b>{{headers[7]['name']}}</b></div>
+        <div class="headerRowItem" title="{{headers[8]['name']}}"><b>{{headers[8]['name']}}</b></div>
+        <div class="headerRowItem" title="{{headers[9]['name']}}"><b>{{headers[9]['name']}}</b></div>
+        <div class="headerRowItem" title="{{headers[10]['name']}}"><b>{{headers[10]['name']}}</b></div>
+        <div class="headerRowItem" title="{{headers[11]['name']}}"><b>{{headers[11]['name']}}</b></div>
+    </div>
+    <div id="virtualScrollTableArea">
+        <cdk-virtual-scroll-viewport [itemSize]="20">
+            <div *cdkVirtualFor="let element of linFramesObservableList$ | async" class="scrollListItemRow">
+                <div class="scrollListItem" title="{{element.SessionID}}">{{element.SessionID}}</div>
+                <div class="scrollListItem" title="{{element.PCKNO}}">{{element.PCKNO}}</div>
+                <div class="scrollListItem" title="{{element.FNO}}">{{element.FNO}}</div>
+                <div class="scrollListItem" title="{{element.PID}}">{{showDecimal ? element.PIDDec : element.PID}}{{showSignalNames ? element.PIDName : null}}</div>
+                <div class="scrollListItem" title="{{element.FDATA0}}">{{element.FDATA0}}{{showSignalNames ? element.FDATA0Name : null}}</div>
+                <div class="scrollListItem" title="{{element.FDATA1}}">{{element.FDATA1}}{{showSignalNames ? element.FDATA1Name : null}}</div>
+                <div class="scrollListItem" title="{{element.FDATA2}}">{{element.FDATA2}}{{showSignalNames ? element.FDATA2Name : null}}</div>
+                <div class="scrollListItem" title="{{element.FDATA3}}">{{element.FDATA3}}{{showSignalNames ? element.FDATA3Name : null}}</div>
+                <div class="scrollListItem" title="{{element.FDATA4}}">{{element.FDATA4}}{{showSignalNames ? element.FDATA4Name : null}}</div>
+                <div class="scrollListItem" title="{{element.FDATA5}}">{{element.FDATA5}}{{showSignalNames ? element.FDATA5Name : null}}</div>
+                <div class="scrollListItem" title="{{element.FDATA6}}">{{element.FDATA6}}{{showSignalNames ? element.FDATA6Name : null}}</div>
+                <div class="scrollListItem" title="{{element.FDATA7}}">{{element.FDATA7}}{{showSignalNames ? element.FDATA7Name : null}}</div>
+            </div>
+        </cdk-virtual-scroll-viewport>
+    </div>
+    <div id="user_input_container">
+        <div class="user_input_wrapper" id="device_control_wrapper">
+            <div class="user_input_controls_label">Select device:</div>
+            <div class="input_row">
+                <ng-select id="device_select_dropdown" [(ngModel)]="devicesComponentState.selectedDeviceId" bindValue="name" [dropdownPosition]="'top'" placeholder="No device selected" (change)="getSelectedDeviceId()" [disabled]="selectDeviceIdInputDisabled">
+                    <ng-option *ngFor="let device of devices" [value]="device.name">{{device.name}}</ng-option>
+                </ng-select>
+            </div>
+            <div class="user_input_controls_label">Device action:</div>
+            <div class="input_row">
+                <div id="device_btn_area">
+                    <div *ngIf="!devicesComponentState.deviceConnected; else showDisconnectBtn">
+                        <button type="button" class="btn btn-success ml-1" (click)="addUserToSignalRGroup()" [disabled]="connectionButtonDisabled">Connect</button>
+                    </div>
+                    <ng-template #showDisconnectBtn>
+                        <button type="button" class="btn btn-danger ml-1" (click)="removeUserFromSignalRGroup()" [disabled]="connectionButtonDisabled">Disconnect</button>
+                    </ng-template>
+                </div>
+                <div id="device_status_area">
+                    <div id="status_text">Status: {{devicesComponentState.deviceStatusText}}</div>
+                </div>
+            </div>
+        </div>
+        <div class="vertical_divider"></div>
+        <div class="user_input_wrapper" id="table_control_wrapper">
+            <div class="user_input_controls_label">Table actions:</div>
+            <div class="input_row">
+                <mat-checkbox [(ngModel)]="devicesComponentState.alwaysScrollToBottom" [color]="checkBoxColor" (change)="toggleAutoscroll($event)">Auto scroll-down</mat-checkbox>
+                <mat-checkbox [(ngModel)]="devicesComponentState.showDecimalValues" [color]="checkBoxColor" (change)="toggleShowDecimalValues($event)">PID Decimal</mat-checkbox>
+                <mat-checkbox [(ngModel)]="devicesComponentState.showSignalNames" [color]="checkBoxColor" (change)="toggleShowSignalNames($event)">Signal names</mat-checkbox>
+
+            </div>
+            <div class="user_input_controls_label">Filter table:</div>
+            <div class="input_row">
+                <input type="text" id="filterSearchInput" placeholder="Type filter keyword" (keyup)="onKeyUp($event)">
+            </div>
+        </div>
+        <div class="vertical_divider"></div>
+        <div class="user_input_wrapper">
+            <div class="user_input_controls_label">Quick actions:</div>
+            <div class="input_row">
+                <button type="button" class="quick_action_btn btn btn-primary" (click)="clearTable()">Clear table</button>
+            </div>
+            <!--<div class="input_row">
+                <button type="button" class="quick_action_btn btn btn-primary" (click)="saveFrameDataToSessionStorage()">Save data</button>
+            </div>-->
+        </div>
+    </div>

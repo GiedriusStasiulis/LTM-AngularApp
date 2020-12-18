@@ -1,15 +1,16 @@
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { SidebarModule } from './modules/sidebar/sidebar.module';
-import { ToggleSidebarModule } from './modules/toggle-sidebar/toggle-sidebar.module';
-import { DashboardModule } from './modules/dashboard/dashboard.module';
-import { DevicesModule } from './modules/devices/devices.module';
-import { SettingsListModule } from './modules/settings/settings-list/settings-list.module';
-import { SettingsEditModule } from './modules/settings/settings-edit/settings-edit.module';
+import { SidebarModule } from './components/sidebar/sidebar.module';
+import { ToggleSidebarModule } from './components/toggle-sidebar/toggle-sidebar.module';
+import { MonitoringChartviewComponent } from './components/monitoring-chartview/monitoring-chartview.component';
+import { MonitoringTableviewComponent } from './components/monitoring-tableview/monitoring-tableview.component';
+import { SettingsListModule } from './components/settings/settings-list/settings-list.module';
+import { SettingsEditModule } from './components/settings/settings-edit/settings-edit.module';
+
 import { SignalRService } from './services/signalR/signal-r.service';
 import { ComponentStateService } from './services/component-state-service/component-state.service';
-import { SettingsDataService } from '../app/services/settings-data/settings-data.service';
-import { LinframesDataService } from './services/linframes-data/linframes-data.service';
+import { SettingsDataService } from './services/data/settings-data/settings-data.service';
+import { LinframesDataService } from './services/data/linframes-data/linframes-data.service';
 
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
@@ -25,7 +26,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';  
-import { RouterModule, Routes } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { ScrollingModule } from '@angular/cdk/scrolling';
@@ -35,6 +36,7 @@ import { MsalGuard, MsalInterceptor, MsalBroadcastService, MsalInterceptorConfig
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { ChartsModule } from 'ng2-charts';
 
 const isIE = window.navigator.userAgent.indexOf("MSIE ") > -1 || window.navigator.userAgent.indexOf("Trident/") > -1;
 
@@ -72,6 +74,8 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
 @NgModule({
   declarations: [
     AppComponent,
+    MonitoringChartviewComponent,
+    MonitoringTableviewComponent
   ],
   imports: [
     BrowserModule,
@@ -79,11 +83,9 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
     AppRoutingModule,
     BrowserAnimationsModule,
     MatSidenavModule,
-    DashboardModule,
     SidebarModule,
     SettingsListModule,
     SettingsEditModule,
-    DevicesModule,
     ToggleSidebarModule,
     MatTabsModule,
     MatTableModule,
@@ -103,7 +105,8 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
     MatCardModule,
     ScrollingModule,
     TableVirtualScrollModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    ChartsModule
   ],
   providers: [
     {

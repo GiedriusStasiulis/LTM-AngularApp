@@ -1,6 +1,5 @@
 export enum ComponentStateType
 {
-  DashoardComponentState = "DashoardComponentState",
-  DevicesComponentState = "DevicesComponentState",
+  MonitoringTableviewState = "MonitoringTableviewState",
   SettingsComponentState = "SettingsComponentState"
 }

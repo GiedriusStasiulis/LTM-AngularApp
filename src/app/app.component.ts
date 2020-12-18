@@ -2,17 +2,17 @@ import { Component, HostListener, Inject, OnInit } from '@angular/core';
 import { SidebarService } from 'src/app/services/component-state-service/sidebar.service';
 import { mainContentAnimation } from './animations';
 import { MsalService, MsalBroadcastService, MSAL_GUARD_CONFIG, MsalGuardConfiguration } from '@azure/msal-angular';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { AccountInfo, BrowserCacheLocation, EventMessage, EventType, InteractionType } from '@azure/msal-browser';
-import { concatMap, filter, takeUntil } from 'rxjs/operators';
+import { concatMap, filter, takeUntil, withLatestFrom } from 'rxjs/operators';
 import * as msal from "@azure/msal-browser";
-import { SubSink } from 'subsink';
 import { SignalRService } from './services/signalR/signal-r.service';
-import { LinframesDataService } from './services/linframes-data/linframes-data.service';
-import { LinFrame } from './models/linFrame';
+import { LinframesDataService } from './services/data/linframes-data/linframes-data.service';
+import { LinFrame } from './models/data/linFrame';
 import { ComponentStateService } from './services/component-state-service/component-state.service';
 import { ComponentStateType } from './models/component-states/component-state-type-enum';
-import { DevicesComponentState } from './models/component-states/devices-state';
+import { UserSettingsItem } from './models/data/userSettingsItem';
+import { MonitoringTableviewState } from './models/component-states/monitoring-tableview-state';
 
 const isIE = window.navigator.userAgent.indexOf("MSIE ") > -1 || window.navigator.userAgent.indexOf("Trident/") > -1;
 
@@ -42,13 +42,16 @@ const myMSALObj = new msal.PublicClientApplication(msalConfig);
 })
 export class AppComponent implements OnInit
 {
-  devicesComponentState: DevicesComponentState;
+  private readonly _destroyed$ = new Subject<void>();
+
+  monitoringTableviewState: MonitoringTableviewState;
   deviceConnected: boolean;
 
   sidebarState: string;
   isIframe = false;
   loggedIn = false;
-  private readonly _destroyed$ = new Subject<void>();
+
+  public userSettingsItems$ = new BehaviorSubject<UserSettingsItem[]>([]);
   
   constructor(@Inject(MSAL_GUARD_CONFIG) private _msalGuardConfig: MsalGuardConfiguration, 
               private _sidebarService: SidebarService, 
@@ -79,10 +82,12 @@ export class AppComponent implements OnInit
     //One sub to push frames to linframes-data.service
     this._signalRService.messageObservable$
       .pipe(
-        takeUntil(this._destroyed$)
+        takeUntil(this._destroyed$),
+        withLatestFrom(this.userSettingsItems$),
       )    
-      .subscribe(async message => {
+      .subscribe(async ([message]) => {
         var elementsToPush: LinFrame[] = this.parseLinFramePacket(JSON.parse(message));
+        
         this._linframesDataService.pushFramesToObservable(elementsToPush);
     });    
 
@@ -94,13 +99,13 @@ export class AppComponent implements OnInit
         this.sidebarState = newState;
     });
 
-    this._componentStateService.devicesComponentState$
+    this._componentStateService.monitoringTableViewState$
       .pipe(
         concatMap(async (item) => item),
         takeUntil(this._destroyed$)
       )
       .subscribe(result => {
-        this.devicesComponentState = result;
+        this.monitoringTableviewState = result;
       });     
   }
 
@@ -114,6 +119,14 @@ export class AppComponent implements OnInit
       const localAccount = myAccounts[0];
       sessionStorage.setItem("signedInAccount", JSON.stringify(localAccount));
     }    
+  }
+
+  getCurrentAccountId()
+  {
+    const localAccount = sessionStorage.getItem("signedInAccount");
+    var accInfo = JSON.parse(localAccount);
+
+    return accInfo.localAccountId;
   }
 
   login() {
@@ -148,7 +161,7 @@ export class AppComponent implements OnInit
         PCKNO: message.PCKNO,
         FNO: message.FRAMES[i].FNO,
         PID: payloadArr[0],
-        //PID_DEC: parseInt(payloadArr[0], 16),
+        PIDDec: parseInt(payloadArr[0], 16).toString(),
         FDATA0: payloadArr[1],
         FDATA1: payloadArr[2],
         FDATA2: payloadArr[3],
@@ -170,12 +183,12 @@ export class AppComponent implements OnInit
   @HostListener('window:beforeunload',['$event'])
   async ngOnDestroy(event: { preventDefault: () => void; returnValue: string; }) {
   
-    if(this.devicesComponentState.deviceConnected)
+    if(this.monitoringTableviewState.deviceConnected)
     {      
       (await this._signalRService.removeUserFromSignalRGroup()).subscribe(() => {
         
-        this.devicesComponentState.deviceConnected = false;
-        this._componentStateService.saveComponentState(ComponentStateType.DevicesComponentState, this.devicesComponentState);
+        this.monitoringTableviewState.deviceConnected = false;
+        this._componentStateService.saveComponentState(ComponentStateType.MonitoringTableviewState, this.monitoringTableviewState);
       });       
 
       if(event)

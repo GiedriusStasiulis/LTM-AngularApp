@@ -1,0 +1,40 @@
+<div class="sidebar_menu" [@onSideNavChange]="sidebarState">
+
+    <mat-nav-list class="menu-list">
+
+        <div id="sidenav_top">
+            <div id="app_logo">Logo</div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <!--<a mat-list-item routerLinkActive="active-list-item" routerLink="dashboard" title="Dashboard" class="menu_item">
+            <mat-icon class="icon" [@iconAnimation]="sidebarState">device_hub</mat-icon>
+            <span class="label" [@labelAnimation]="sidebarState">Dashboard</span>
+        </a>-->
+
+        <a mat-list-item routerLinkActive="active-list-item" routerLink="monitoring-tableview" title="Monitoring" class="menu_item">
+            <mat-icon class="icon" [@iconAnimation]="sidebarState">table_chart</mat-icon>
+            <span class="label" [@labelAnimation]="sidebarState">Monitoring</span>
+        </a>
+
+        <a mat-list-item routerLinkActive="active-list-item" routerLink="settings" title="Settings" class="menu_item">
+            <mat-icon class="icon" [@iconAnimation]="sidebarState">settings</mat-icon>
+            <span class="label" [@labelAnimation]="sidebarState">Settings</span>
+        </a>
+
+        <div id="account_area">
+            <div id="user_actions" class="d-flex flex-column">
+                <div class="p-0">
+                    <a class="btn" id="account_btn" title="Logged in user: {{profileName}} ({{profileEmail}})"><span class="material-icons">account_circle</span></a>
+                </div>
+                <div class="p-0">
+                    <a class="btn" id="logoff_btn" title="Logout" (click)="logout()"><span class="material-icons">power_settings_new</span></a>
+                </div>
+            </div>
+            <mat-divider></mat-divider>
+        </div>
+
+    </mat-nav-list>
+    <app-toggle-sidebar></app-toggle-sidebar>
+</div>
