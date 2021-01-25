@@ -35,8 +35,6 @@ export class SignalRService {
 
         this.init(results);
 
-        //console.log(this.getSelectedDeviceId());
-
         console.log("SignalR Service started!")
       }, err => {
         console.log(err);
